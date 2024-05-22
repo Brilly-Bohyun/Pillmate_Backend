@@ -10,6 +10,7 @@ import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import pillmate.backend.entity.member.Member;
 
 @Entity
 @Getter

@@ -11,6 +11,7 @@ import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import pillmate.backend.entity.member.Member;
 
 @Entity
 @Getter
@@ -30,10 +31,6 @@ public class MedicinePerMember {
 
     @Column(name = "amount", nullable = false)
     private Integer amount;
-
-    // 투여횟수 일
-    @Column(name = "day", nullable = false)
-    private Integer day;
 
     // 투여횟수 회
     @Column(name = "times", nullable = false)
