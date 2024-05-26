@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import nerds.studiousTestProject.common.exception.CustomException;
-import nerds.studiousTestProject.common.exception.errorcode.ErrorCode;
+import pillmate.backend.common.exception.CustomException;
+import pillmate.backend.common.exception.errorcode.ErrorCode;
 
 @AllArgsConstructor
 @Builder

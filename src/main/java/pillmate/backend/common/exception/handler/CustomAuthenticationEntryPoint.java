@@ -6,16 +6,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nerds.studiousTestProject.common.exception.response.ExceptionResponse;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
+import pillmate.backend.common.exception.response.ExceptionResponse;
 
 import java.io.IOException;
 
-import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_PAGE;
-import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_HAVE_PERMISSION;
+import static pillmate.backend.common.exception.errorcode.ErrorCode.NOT_FOUND_PAGE;
+import static pillmate.backend.common.exception.errorcode.ErrorCode.NOT_HAVE_PERMISSION;
 
 /**
  * 인증이 실패한 상황(403)을 처리하는 AuthenticationEntryPoint 인터페이스의 구현 클래스

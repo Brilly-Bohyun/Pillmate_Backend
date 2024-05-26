@@ -2,14 +2,6 @@ package pillmate.backend.common.exception.handler;
 
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
-import nerds.studiousTestProject.common.exception.BadRequestException;
-import nerds.studiousTestProject.common.exception.NotAuthorizedException;
-import nerds.studiousTestProject.common.exception.NotFoundException;
-import nerds.studiousTestProject.common.exception.errorcode.ErrorCode;
-import nerds.studiousTestProject.common.exception.errorcode.HeaderErrorCode;
-import nerds.studiousTestProject.common.exception.errorcode.MethodErrorCode;
-import nerds.studiousTestProject.common.exception.errorcode.ParamErrorCode;
-import nerds.studiousTestProject.common.exception.response.ExceptionResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -23,14 +15,22 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import pillmate.backend.common.exception.BadRequestException;
+import pillmate.backend.common.exception.NotAuthorizedException;
+import pillmate.backend.common.exception.NotFoundException;
+import pillmate.backend.common.exception.errorcode.ErrorCode;
+import pillmate.backend.common.exception.errorcode.HeaderErrorCode;
+import pillmate.backend.common.exception.errorcode.MethodErrorCode;
+import pillmate.backend.common.exception.errorcode.ParamErrorCode;
+import pillmate.backend.common.exception.response.ExceptionResponse;
 
-import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_REQUEST_BODY_TYPE;
-import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_PAGE;
-import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_PARSING_BODY;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
+import static pillmate.backend.common.exception.errorcode.ErrorCode.INVALID_REQUEST_BODY_TYPE;
+import static pillmate.backend.common.exception.errorcode.ErrorCode.NOT_FOUND_PAGE;
+import static pillmate.backend.common.exception.errorcode.ErrorCode.NOT_PARSING_BODY;
 
 @RestControllerAdvice
 @Slf4j
