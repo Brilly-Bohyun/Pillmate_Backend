@@ -46,5 +46,5 @@ public class MedicinePerMember {
 
     // 투여시간
     @Column(name = "time", nullable = false)
-    private Integer time;
+    private String time;
 }

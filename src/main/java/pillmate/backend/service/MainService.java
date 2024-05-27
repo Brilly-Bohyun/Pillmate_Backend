@@ -59,7 +59,7 @@ public class MainService {
     }
 
     private List<MedicineAlarmRecord> getMedicineRecords(Long memberId) {
-        List<Alarm> alarmList = alarmRepository.findByMemberId(memberId);
+        List<Alarm> alarmList = alarmRepository.findAllByMemberId(memberId);
         return alarmList.stream()
                 .map(alarm -> MedicineAlarmRecord.builder()
                         .name(alarm.getMedicine().getName())
