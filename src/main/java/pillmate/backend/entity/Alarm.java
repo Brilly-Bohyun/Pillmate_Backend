@@ -16,6 +16,9 @@ import pillmate.backend.entity.member.Member;
 
 import java.time.LocalTime;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -36,10 +39,10 @@ public class Alarm {
     private LocalTime time;
 
     @Column(name = "isEaten", nullable = false)
-    private Boolean isEaten = false;
+    private Boolean isEaten = FALSE;
 
     @Column(name = "isAvailable", nullable = false)
-    private Boolean isAvailable = true;
+    private Boolean isAvailable = TRUE;
 
     @Builder
     public Alarm(Long id, Member member, Medicine medicine, LocalTime time, Boolean isEaten, Boolean isAvailable) {

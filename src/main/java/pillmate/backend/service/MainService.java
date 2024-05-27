@@ -27,11 +27,8 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class MainService {
-    @Autowired
     private final AlarmRepository alarmRepository;
-    @Autowired
     private final MedicinePerMemberRepository medicinePerMemberRepository;
-    @Autowired
     private final MedicineRecordRepository medicineRecordRepository;
 
     private LocalDate START_DATE = LocalDate.now().withDayOfMonth(1);

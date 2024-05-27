@@ -15,7 +15,6 @@ import pillmate.backend.service.MainService;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/main")
 public class MainController {
-    @Autowired
     private final MainService mainService;
 
     @GetMapping

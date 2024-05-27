@@ -10,15 +10,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pillmate.backend.common.util.LoggedInMember;
 import pillmate.backend.dto.alarm.AlarmRequest;
-import pillmate.backend.service.AlarmService;
+import pillmate.backend.service.alarm.AlarmService;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/alarms")
 public class AlarmController {
-
-    @Autowired
     private final AlarmService alarmService;
 
     @PostMapping
