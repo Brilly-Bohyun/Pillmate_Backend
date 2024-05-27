@@ -12,8 +12,10 @@ import pillmate.backend.entity.member.Member;
 import pillmate.backend.entity.member.MemberRole;
 import pillmate.backend.entity.member.Role;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 
 @AllArgsConstructor
 @Builder
@@ -38,6 +40,8 @@ public class SignUpRequest {
 
     private LocalTime bed;
 
+    private Map<String, LocalDate> diseases;
+
     @NotNull(message = "권한은 필수입니다.")
     @Size(min = 1, message = "권한은 최소 1개 이상이여야 합니다.")
     private List<String> roles;
@@ -52,6 +56,7 @@ public class SignUpRequest {
                 .lunch(lunch)
                 .dinner(dinner)
                 .bed(bed)
+                .diseases(diseases)
                 .build();
 
         roles.stream().map(

@@ -2,7 +2,9 @@ package pillmate.backend.entity.member;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
@@ -11,6 +13,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.MapKeyColumn;
 import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -20,10 +24,12 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Getter
@@ -59,6 +65,12 @@ public class Member {
     @Column(name = "bed", nullable = false)
     private LocalTime bed;
 
+    @ElementCollection
+    @CollectionTable(name = "member_diseases", joinColumns = @JoinColumn(name = "member_id"))
+    @MapKeyColumn(name = "disease")
+    @Column(name = "diagnosis_date")
+    private Map<String, LocalDate> diseases;
+
     @Column(name = "provider_id", nullable = true)
     private Long providerId;
 
@@ -71,7 +83,7 @@ public class Member {
     private MemberType type;
 
     @Builder
-    public Member(Long id, String email, String name, String password, LocalTime wakeUp, LocalTime morning, LocalTime lunch, LocalTime dinner, LocalTime bed, MemberType type, Long providerId) {
+    public Member(Long id, String email, String name, String password, LocalTime wakeUp, LocalTime morning, LocalTime lunch, LocalTime dinner, LocalTime bed, MemberType type, Long providerId, Map<String, LocalDate> diseases) {
         this.id = id;
         this.email = email;
         this.name = name;
@@ -81,6 +93,7 @@ public class Member {
         this.lunch = lunch;
         this.dinner = dinner;
         this.bed = bed;
+        this.diseases = diseases;
         this.type = type;
         this.providerId = providerId;
     }
