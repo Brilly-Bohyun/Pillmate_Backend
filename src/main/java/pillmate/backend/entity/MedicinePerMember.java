@@ -60,4 +60,42 @@ public class MedicinePerMember {
         this.date = date;
         this.time = time;
     }
+
+    public void update(final Integer amount, final Integer times, final Integer month, final Integer date, final String time) {
+        updateAmount(amount);
+        updateTimes(times);
+        updateMonth(month);
+        updateDate(date);
+        updateTime(time);
+    }
+
+    private void updateAmount(Integer amount) {
+        if (amount != null) {
+            this.amount = amount;
+        }
+    }
+
+    private void updateTimes(Integer times) {
+        if (times != null) {
+            this.times = times;
+        }
+    }
+
+    private void updateMonth(Integer month) {
+        if (month != null) {
+            this.month = month;
+        }
+    }
+
+    private void updateDate(Integer date) {
+        if (date != null) {
+            this.date = date;
+        }
+    }
+
+    private void updateTime(String time) {
+        if (time != null) {
+            this.time = time;
+        }
+    }
 }

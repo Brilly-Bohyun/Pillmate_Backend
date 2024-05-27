@@ -8,9 +8,12 @@ import pillmate.backend.common.exception.NotFoundException;
 import pillmate.backend.common.exception.errorcode.ErrorCode;
 import pillmate.backend.dto.alarm.AlarmRequest;
 import pillmate.backend.dto.medicine.AddDirectlyRequest;
+import pillmate.backend.dto.medicine.MedicineInfo;
+import pillmate.backend.dto.medicine.ModifyMedicineInfo;
 import pillmate.backend.dto.medicine.UpcomingAlarm;
 import pillmate.backend.entity.Alarm;
 import pillmate.backend.entity.Medicine;
+import pillmate.backend.entity.MedicinePerMember;
 import pillmate.backend.entity.member.Member;
 import pillmate.backend.repository.AlarmRepository;
 import pillmate.backend.repository.MedicinePerMemberRepository;
@@ -19,6 +22,8 @@ import pillmate.backend.repository.MemberRepository;
 import pillmate.backend.service.alarm.AlarmService;
 
 import java.time.LocalTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -44,6 +49,40 @@ public class MedicineService {
         LocalTime userTime = findByTime(findByMemberId(memberId), addDirectlyRequest.getTimeOfDay());
         AlarmRequest alarmRequest = AlarmRequest.builder().medicineName(addDirectlyRequest.getMedicineName()).time(userTime).build();
         alarmService.createAlarm(memberId, alarmRequest);
+    }
+
+    public List<MedicineInfo> showAll(Long memberId) {
+        return findAllByMemberId(memberId).stream()
+                .map(medicinePerMember -> MedicineInfo.builder()
+                        .picture(medicinePerMember.getMedicine().getPhoto())
+                        .name(medicinePerMember.getMedicine().getName())
+                        .category(medicinePerMember.getMedicine().getCategory())
+                        .amount(medicinePerMember.getAmount())
+                        .timesPerDay(medicinePerMember.getTimes())
+                        .month(medicinePerMember.getMonth())
+                        .day(medicinePerMember.getDate())
+                        .timeOfDay(medicinePerMember.getTime())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void modify(Long memberId, ModifyMedicineInfo modifyMedicineInfo) {
+        Medicine medicine = findByName(modifyMedicineInfo.getMedicineName());
+        MedicinePerMember medicinePerMember = findByMemberIdAndMedicineId(memberId, medicine.getId());
+        medicinePerMember.update(modifyMedicineInfo.getAmount(),
+                modifyMedicineInfo.getTimesPerDay(),
+                modifyMedicineInfo.getMonth(),
+                modifyMedicineInfo.getDay(),
+                modifyMedicineInfo.getTimeOfDay());
+    }
+
+    private List<MedicinePerMember> findAllByMemberId(Long memberId) {
+        return medicinePerMemberRepository.findAllByMemberId(memberId);
+    }
+
+    private MedicinePerMember findByMemberIdAndMedicineId(Long memberId, Long medicineId) {
+        return medicinePerMemberRepository.findByMemberIdAndMedicineId(memberId, medicineId);
     }
 
     private Member findByMemberId(Long memberId) {
