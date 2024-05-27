@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import pillmate.backend.entity.member.Member;
@@ -47,4 +48,16 @@ public class MedicinePerMember {
     // 투여시간
     @Column(name = "time", nullable = false)
     private String time;
+
+    @Builder
+    public MedicinePerMember(Long id, Member member, Medicine medicine, Integer amount, Integer times, Integer month, Integer date, String time) {
+        this.id = id;
+        this.member = member;
+        this.medicine = medicine;
+        this.amount = amount;
+        this.times = times;
+        this.month = month;
+        this.date = date;
+        this.time = time;
+    }
 }
