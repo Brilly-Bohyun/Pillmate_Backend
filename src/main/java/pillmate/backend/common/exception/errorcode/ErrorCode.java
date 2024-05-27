@@ -21,6 +21,7 @@ public enum ErrorCode {
     NOT_EXPIRED_REFRESH_TOKEN("Refresh Token이 만료되지 않았습니다."),
     INVALID_MEMBER_TYPE("회원 타입이 올바르지 않습니다"),
     NOT_FOUND_SOCIAL_INFO("알맞는 소셜 서비스를 찾을 수 없습니다."),
+    NOT_FOUND_DIARY("건강 일지를 찾을 수 없습니다."),
     NOT_DEFAULT_TYPE_USER("소셜 연동 계정입니다. 소셜 로그인을 사용하여 로그인해주세요."),
     NOT_EXIST_PROVIDER_ID("소셜 회원가입에서 providerId 값이 존재하지 않습니다."),
     WEB_CLIENT_ERROR("웹 API 호출 예외 발생. 자세한 건 서버 로그를 참고하세요."),

@@ -28,6 +28,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -69,7 +70,7 @@ public class Member {
     @CollectionTable(name = "member_diseases", joinColumns = @JoinColumn(name = "member_id"))
     @MapKeyColumn(name = "disease")
     @Column(name = "diagnosis_date")
-    private Map<String, LocalDate> diseases;
+    private Map<String, LocalDate> diseases = new HashMap<>();
 
     @Column(name = "provider_id", nullable = true)
     private Long providerId;
