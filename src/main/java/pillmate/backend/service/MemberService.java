@@ -71,8 +71,13 @@ public class MemberService {
     public LoginResponse issueToken(String email, String password) {
         Member member = findMemberByEmail(email);
         boolean matches = passwordEncoder.matches(password, member.getPassword());
-        if (!member.getType().equals(MemberType.DEFAULT) && matches) {
+
+        if (!member.getType().equals(MemberType.DEFAULT)) {
             throw new NotFoundException(NOT_DEFAULT_TYPE_USER);
+        }
+
+        if (!matches) {
+            throw new NotFoundException(MISMATCH_PASSWORD);
         }
 
         JwtTokenResponse tokenInfo = jwtTokenProvider.generateToken(member);

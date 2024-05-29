@@ -4,13 +4,22 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import pillmate.backend.common.exception.handler.CustomAccessDeniedHandler;
+import pillmate.backend.common.exception.handler.CustomAuthenticationEntryPoint;
 import pillmate.backend.common.exception.handler.HttpRequestEndPointChecker;
+import pillmate.backend.common.filter.JwtAuthenticationFilter;
+import pillmate.backend.common.filter.JwtExceptionHandlerFilter;
 import pillmate.backend.common.util.JwtTokenProvider;
 
 /**
@@ -23,6 +32,36 @@ import pillmate.backend.common.util.JwtTokenProvider;
 public class SecurityConfig {
     private final HttpRequestEndPointChecker httpRequestEndPointChecker;
     private final JwtTokenProvider jwtTokenProvider;
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.httpBasic().disable()
+                .csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .authorizeHttpRequests()
+                .requestMatchers(CorsUtils::isPreFlightRequest).permitAll() // Preflight request에 대해, 인증을 하지 않고 모든 요청을 허용
+//                .requestMatchers("/studious/mypage/**", "/studious/reservations/**", "/studious/payments/**").hasAnyRole("USER", "ADMIN")
+//                .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+//                .requestMatchers("/api/v1/members/logout").hasAnyRole("USER", "ADMIN")
+//                .requestMatchers("/api/v1/oauth/**").permitAll()
+//                .requestMatchers("/api/v1/members/**").permitAll()
+//                .requestMatchers("/api/v1/search/**").permitAll()
+//                .requestMatchers("/api/v1/studycafes/**").permitAll()
+//                .requestMatchers("/api/v1/main").permitAll()
+//                .anyRequest().authenticated()
+                .anyRequest().permitAll()
+                .and()
+                .cors()
+                .and()
+                .exceptionHandling().accessDeniedHandler(new CustomAccessDeniedHandler())
+                .and()
+                .exceptionHandling().authenticationEntryPoint(new CustomAuthenticationEntryPoint(httpRequestEndPointChecker))
+                .and()
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtExceptionHandlerFilter(), JwtAuthenticationFilter.class);
+        return http.build();
+    }
 
     //Cors 설정
     // Spring MVC 보다 Spring Security가 먼저 실행되므로 Cors 설정은 Security 에서 하는 것이 좋다.

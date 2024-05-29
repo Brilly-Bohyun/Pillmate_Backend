@@ -6,8 +6,11 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
+import pillmate.backend.common.exception.NotAuthorizedException;
 
 import java.security.Principal;
+
+import static pillmate.backend.common.exception.errorcode.ErrorCode.NOT_AUTHORIZE_ACCESS;
 
 public class LoggedInMemberResolver implements HandlerMethodArgumentResolver {
     @Override
@@ -26,7 +29,7 @@ public class LoggedInMemberResolver implements HandlerMethodArgumentResolver {
                 return null;
             }
 
-            throw new Exception();
+            throw new NotAuthorizedException(NOT_AUTHORIZE_ACCESS);
         }
     }
 
