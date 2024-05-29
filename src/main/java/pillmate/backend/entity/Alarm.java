@@ -19,6 +19,7 @@ import java.time.LocalTime;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
+@Builder
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -38,9 +39,11 @@ public class Alarm {
     @Column(name = "time", nullable = false)
     private LocalTime time;
 
+    @Builder.Default
     @Column(name = "isEaten", nullable = false)
     private Boolean isEaten = FALSE;
 
+    @Builder.Default
     @Column(name = "isAvailable", nullable = false)
     private Boolean isAvailable = TRUE;
 

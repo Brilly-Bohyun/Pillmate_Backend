@@ -8,14 +8,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import pillmate.backend.entity.member.Disease;
 import pillmate.backend.entity.member.Member;
 import pillmate.backend.entity.member.MemberRole;
+import pillmate.backend.entity.member.MemberType;
 import pillmate.backend.entity.member.Role;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Map;
 
 @AllArgsConstructor
 @Builder
@@ -40,7 +40,8 @@ public class SignUpRequest {
 
     private LocalTime bed;
 
-    private Map<String, LocalDate> diseases;
+    @NotNull(message = "질병은 필수입니다.")
+    private List<Disease> diseases;
 
     @NotNull(message = "권한은 필수입니다.")
     @Size(min = 1, message = "권한은 최소 1개 이상이여야 합니다.")
@@ -56,7 +57,8 @@ public class SignUpRequest {
                 .lunch(lunch)
                 .dinner(dinner)
                 .bed(bed)
-                .diseases(diseases)
+                .type(MemberType.DEFAULT)
+                .usable(true)
                 .build();
 
         roles.stream().map(
@@ -64,6 +66,13 @@ public class SignUpRequest {
                         .value(MemberRole.valueOf(s))
                         .build()
         ).forEach(member::addRole);
+
+        diseases.stream().map(
+                d -> Disease.builder()
+                        .disease(d.getDisease())
+                        .startDate(d.getStartDate())
+                        .build()
+        ).forEach(member::addDisease);
 
         return member;
     }

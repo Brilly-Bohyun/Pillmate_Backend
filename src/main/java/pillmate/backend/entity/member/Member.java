@@ -1,6 +1,7 @@
 package pillmate.backend.entity.member;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -23,6 +24,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -37,7 +39,7 @@ import java.util.stream.Collectors;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
-public class Member {
+public class Member implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -66,11 +68,9 @@ public class Member {
     @Column(name = "bed", nullable = false)
     private LocalTime bed;
 
-    @ElementCollection
-    @CollectionTable(name = "member_diseases", joinColumns = @JoinColumn(name = "member_id"))
-    @MapKeyColumn(name = "disease")
-    @Column(name = "diagnosis_date")
-    private Map<String, LocalDate> diseases = new HashMap<>();
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Disease> diseases = new ArrayList<>();
 
     @Column(name = "provider_id", nullable = true)
     private Long providerId;
@@ -83,8 +83,11 @@ public class Member {
     @Enumerated(value = EnumType.STRING)
     private MemberType type;
 
+    @Column(name = "usable", nullable = false)
+    private Boolean usable;
+
     @Builder
-    public Member(Long id, String email, String name, String password, LocalTime wakeUp, LocalTime morning, LocalTime lunch, LocalTime dinner, LocalTime bed, MemberType type, Long providerId, Map<String, LocalDate> diseases) {
+    public Member(Long id, String email, String name, String password, LocalTime wakeUp, LocalTime morning, LocalTime lunch, LocalTime dinner, LocalTime bed, MemberType type, Long providerId, Boolean usable) {
         this.id = id;
         this.email = email;
         this.name = name;
@@ -94,15 +97,21 @@ public class Member {
         this.lunch = lunch;
         this.dinner = dinner;
         this.bed = bed;
-        this.diseases = diseases;
         this.type = type;
         this.providerId = providerId;
+        this.usable = usable;
     }
 
     public void addRole(Role role) {
         if (role != null) {
             roles.add(role);
             role.setMember(this);
+        }
+    }
+
+    public void addDisease(Disease disease) {
+        if (disease != null) {
+            diseases.add(disease);
         }
     }
 
@@ -114,9 +123,39 @@ public class Member {
                 .collect(Collectors.toList());
     }
 
+    @JsonIgnore
+    @Override
+    public String getUsername() {
+        return String.valueOf(id);
+    }
+
     public void updatePassword(String encodedPassword) {
         if (encodedPassword != null && !encodedPassword.isEmpty()) {
             this.password = encodedPassword;
         }
+    }
+
+    @JsonIgnore
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @JsonIgnore
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @JsonIgnore
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @JsonIgnore
+    @Override
+    public boolean isEnabled() {
+        return usable;
     }
 }
