@@ -14,7 +14,7 @@ import java.util.List;
 public class CreateDiaryRequest {
     private LocalDate date;
 
-    private List<String> symptom = new ArrayList<>();
+    private List<String> symptom;
 
     private Integer score;
 

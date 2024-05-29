@@ -42,6 +42,7 @@ public class MedicineService {
         return UpcomingAlarm.builder().medicineName(alarm.getMedicine().getName()).time(alarm.getTime()).build();
     }
 
+    @Transactional
     public void addDirectly(Long memberId, AddDirectlyRequest addDirectlyRequest) {
         medicinePerMemberRepository.save(addDirectlyRequest.toEntity(findByMemberId(memberId), findByName(addDirectlyRequest.getMedicineName())));
 
