@@ -8,15 +8,19 @@ import pillmate.backend.dto.main.AdherenceRate;
 import pillmate.backend.dto.main.BestRecord;
 import pillmate.backend.dto.main.MainResponse;
 import pillmate.backend.dto.main.MedicineAlarmRecord;
+import pillmate.backend.dto.main.WeekRateInfo;
 import pillmate.backend.dto.main.WorstRecord;
 import pillmate.backend.entity.Alarm;
 import pillmate.backend.entity.MedicinePerMember;
+import pillmate.backend.entity.MedicineRecord;
 import pillmate.backend.repository.AlarmRepository;
 import pillmate.backend.repository.MedicinePerMemberRepository;
 import pillmate.backend.repository.MedicineRecordRepository;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,6 +39,7 @@ public class MainService {
 
     public MainResponse show(final Long memberId) {
         return MainResponse.builder()
+                .weekRateInfoList(getWeeklyIntakeRates(memberId))
                 .medicineAlarmRecords(getMedicineRecords(memberId))
                 .grade(validateGrade(getRate(memberId)))
                 .takenDay(getTakenDay(memberId))
@@ -45,8 +50,42 @@ public class MainService {
                 .build();
     }
 
+    private List<WeekRateInfo> getWeeklyIntakeRates(Long memberId) {
+        LocalDate currentDate = LocalDate.now();
+        LocalDate startOfWeek = currentDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
+
+        List<MedicineRecord> weeklyRecords = medicineRecordRepository.findAllByMemberAndDateBetween(memberId, startOfWeek, currentDate);
+        Integer totalMedicines = getTotalMedicine(memberId);
+
+        return calculateIntakeRates(weeklyRecords, totalMedicines);
+    }
+
+    private List<WeekRateInfo> calculateIntakeRates(List<MedicineRecord> records, Integer totalMedicines) {
+        return records.stream()
+                .collect(Collectors.groupingBy(MedicineRecord::getDate))
+                .entrySet()
+                .stream()
+                .map(entry -> {
+                    LocalDate date = entry.getKey();
+                    List<MedicineRecord> dailyRecords = entry.getValue();
+
+                    Integer eatenMedicines = Math.toIntExact(dailyRecords.stream().filter(MedicineRecord::getIsEaten).count());
+                    Integer intakeRate = (int) ((double) eatenMedicines / totalMedicines * 100);
+
+                    return WeekRateInfo.builder()
+                            .date(date)
+                            .rate(intakeRate)
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
+
     private Integer getTakenDay(Long memberId) {
-        return medicineRecordRepository.countEatenDates(memberId, START_DATE, END_DATE);
+        return medicineRecordRepository.countEatenDates(memberId, START_DATE, END_DATE).size();
+    }
+
+    private Integer getTotalMedicine(Long memberId) {
+        return medicinePerMemberRepository.countAllByMemberId(memberId);
     }
 
     private Integer getMonth() {
@@ -55,7 +94,7 @@ public class MainService {
 
     private Integer getRate(Long memberId) {
         Integer uneatenDays = medicineRecordRepository.countUneatenDays(memberId, START_DATE, END_DATE);
-        return 100-(Math.round((100/(getMonth()))* uneatenDays));
+        return 100 - (100 / getMonth() * uneatenDays);
     }
 
     private List<MedicineAlarmRecord> getMedicineRecords(Long memberId) {

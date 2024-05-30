@@ -8,4 +8,5 @@ import java.util.List;
 public interface MedicinePerMemberRepository extends JpaRepository<MedicinePerMember, Long> {
     List<MedicinePerMember> findAllByMemberId(Long memberId);
     MedicinePerMember findByMemberIdAndMedicineId(Long memberId, Long medicineId);
+    Integer countAllByMemberId(Long memberId);
 }
