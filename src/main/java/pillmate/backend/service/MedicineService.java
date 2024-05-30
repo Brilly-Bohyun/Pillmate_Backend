@@ -22,6 +22,7 @@ import pillmate.backend.repository.MemberRepository;
 import pillmate.backend.service.alarm.AlarmService;
 
 import java.time.LocalTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -64,6 +65,7 @@ public class MedicineService {
                         .day(medicinePerMember.getDate())
                         .timeOfDay(medicinePerMember.getTime())
                         .build())
+                .sorted(Comparator.comparing(MedicineInfo::getName))
                 .collect(Collectors.toList());
     }
 
