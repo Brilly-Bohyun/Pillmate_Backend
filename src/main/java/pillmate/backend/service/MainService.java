@@ -110,7 +110,7 @@ public class MainService {
     }
 
     private Integer getTotalAmount(MedicinePerMember medicinePerMember) {
-        return medicinePerMember.getAmount() * medicinePerMember.getTimes() * (medicinePerMember.getMonth() * 30 + medicinePerMember.getDate());
+        return medicinePerMember.getAmount() * medicinePerMember.getTimes() * (medicinePerMember.getDay());
     }
 
     private Integer getTakenAmount(Long memberId, Long medicineId) {

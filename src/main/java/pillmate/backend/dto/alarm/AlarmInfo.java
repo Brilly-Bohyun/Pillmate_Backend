@@ -13,7 +13,6 @@ public class AlarmInfo {
     private String category;
     private Integer amount;
     private Integer timesPerDay;
-    private Integer month;
     private Integer day;
     private Boolean isAvailable;
     private String timeOfDay;

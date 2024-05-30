@@ -37,34 +37,28 @@ public class MedicinePerMember {
     @Column(name = "times", nullable = false)
     private Integer times;
 
-    // 투약일수 개월
-    @Column(name = "month", nullable = false)
-    private Integer month;
-
     // 투약일수 일
-    @Column(name = "date", nullable = false)
-    private Integer date;
+    @Column(name = "day", nullable = false)
+    private Integer day;
 
     // 투여시간
     @Column(name = "time", nullable = false)
     private String time;
 
     @Builder
-    public MedicinePerMember(Long id, Member member, Medicine medicine, Integer amount, Integer times, Integer month, Integer date, String time) {
+    public MedicinePerMember(Long id, Member member, Medicine medicine, Integer amount, Integer times, Integer day, String time) {
         this.id = id;
         this.member = member;
         this.medicine = medicine;
         this.amount = amount;
         this.times = times;
-        this.month = month;
-        this.date = date;
+        this.day = day;
         this.time = time;
     }
 
     public void update(final Integer amount, final Integer times, final Integer month, final Integer date, final String time) {
         updateAmount(amount);
         updateTimes(times);
-        updateMonth(month);
         updateDate(date);
         updateTime(time);
     }
@@ -81,15 +75,9 @@ public class MedicinePerMember {
         }
     }
 
-    private void updateMonth(Integer month) {
-        if (month != null) {
-            this.month = month;
-        }
-    }
-
     private void updateDate(Integer date) {
         if (date != null) {
-            this.date = date;
+            this.day = date;
         }
     }
 

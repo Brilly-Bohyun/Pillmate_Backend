@@ -58,8 +58,7 @@ public class AlarmService {
                             .category(alarm.getMedicine().getCategory())
                             .amount(medicineHistory.getAmount())
                             .timesPerDay(medicineHistory.getTimes())
-                            .month(medicineHistory.getMonth())
-                            .day(medicineHistory.getDate())
+                            .day(medicineHistory.getDay())
                             .timeOfDay(medicineHistory.getTime())
                             .isAvailable(alarm.getIsAvailable())
                             .build();

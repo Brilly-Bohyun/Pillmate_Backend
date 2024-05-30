@@ -22,8 +22,7 @@ public class AddDirectlyRequest {
                 .medicine(medicine)
                 .amount(amount)
                 .times(timesPerDay)
-                .month(month)
-                .date(day)
+                .day(day)
                 .time(timeOfDay)
                 .build();
     }
