@@ -64,6 +64,7 @@ public class MedicineService {
                         .month(medicinePerMember.getMonth())
                         .day(medicinePerMember.getDate())
                         .timeOfDay(medicinePerMember.getTime())
+                        .alarmTime(findByTime(findByMemberId(memberId), medicinePerMember.getTime()))
                         .build())
                 .sorted(Comparator.comparing(MedicineInfo::getName))
                 .collect(Collectors.toList());

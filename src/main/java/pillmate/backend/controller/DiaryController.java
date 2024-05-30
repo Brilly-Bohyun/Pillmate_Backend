@@ -14,10 +14,12 @@ import pillmate.backend.common.util.LoggedInMember;
 import pillmate.backend.dto.diary.CreateDiaryRequest;
 import pillmate.backend.dto.diary.CreateDiaryResponse;
 import pillmate.backend.dto.diary.EditDiaryRequest;
-import pillmate.backend.dto.diary.ShowDiaryResponse;
+import pillmate.backend.dto.diary.MonthlyScore;
+import pillmate.backend.dto.diary.Today;
 import pillmate.backend.service.DiaryService;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -38,7 +40,12 @@ public class DiaryController {
     }
 
     @GetMapping("/{date}")
-    public ShowDiaryResponse show(@LoggedInMember Long memberId, @PathVariable("date") LocalDate date) {
+    public Today showOneDay(@LoggedInMember Long memberId, @PathVariable("date") LocalDate date) {
         return diaryService.show(memberId, date);
+    }
+
+    @GetMapping
+    public List<MonthlyScore> showMonthlyScore(@LoggedInMember Long memberId) {
+        return diaryService.showMonthlyScore(memberId);
     }
 }

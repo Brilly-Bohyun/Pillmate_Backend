@@ -9,13 +9,18 @@ import pillmate.backend.common.exception.errorcode.ErrorCode;
 import pillmate.backend.dto.diary.CreateDiaryRequest;
 import pillmate.backend.dto.diary.CreateDiaryResponse;
 import pillmate.backend.dto.diary.EditDiaryRequest;
+import pillmate.backend.dto.diary.MonthlyScore;
 import pillmate.backend.dto.diary.ShowDiaryResponse;
+import pillmate.backend.dto.diary.Today;
 import pillmate.backend.entity.Diary;
 import pillmate.backend.entity.member.Member;
 import pillmate.backend.repository.DiaryRepository;
 import pillmate.backend.repository.MemberRepository;
 
 import java.time.LocalDate;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static pillmate.backend.common.exception.errorcode.ErrorCode.*;
 
@@ -39,9 +44,24 @@ public class DiaryService {
         diary.update(editDiaryRequest.getSymptom(), editDiaryRequest.getScore(), editDiaryRequest.getRecord());
     }
 
-    public ShowDiaryResponse show(Long memberId, LocalDate date) {
+    public Today show(Long memberId, LocalDate date) {
         Diary diary = diaryRepository.findByMemberIdAndAndDate(memberId, date);
-        return ShowDiaryResponse.builder().symptoms(diary.getSymptom()).record(diary.getRecord()).build();
+        return Today.builder().symptoms(diary.getSymptom()).record(diary.getRecord()).build();
+    }
+
+    public List<MonthlyScore> showMonthlyScore(Long memberId) {
+        LocalDate today = LocalDate.now();
+        LocalDate firstDayOfMonth = today.withDayOfMonth(1);
+
+        List<Diary> diaries = diaryRepository.findDiariesByMemberIdAndDateRange(memberId, firstDayOfMonth, today);
+
+        return diaries.stream()
+                .map(diary -> MonthlyScore.builder()
+                          .date(diary.getDate())
+                          .score(diary.getScore())
+                          .build())
+                .sorted(Comparator.comparing(MonthlyScore::getDate))
+                .collect(Collectors.toList());
     }
 
     private Diary findById(Long diaryId) {

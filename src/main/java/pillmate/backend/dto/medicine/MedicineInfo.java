@@ -3,6 +3,8 @@ package pillmate.backend.dto.medicine;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalTime;
+
 @Builder
 @Data
 public class MedicineInfo {
@@ -14,4 +16,5 @@ public class MedicineInfo {
     private Integer month;
     private Integer day;
     private String timeOfDay;
+    private LocalTime alarmTime;
 }

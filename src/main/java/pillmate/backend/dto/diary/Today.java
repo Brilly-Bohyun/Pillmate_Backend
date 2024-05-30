@@ -7,7 +7,7 @@ import java.util.List;
 
 @Builder
 @Data
-public class ShowDiaryResponse {
-    private MonthlyScore monthlyScore;
-    private Today today;
+public class Today {
+    private List<String> symptoms;
+    private String record;
 }
