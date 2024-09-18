@@ -3,7 +3,6 @@ package pillmate.backend.service.alarm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pillmate.backend.common.exception.NotFoundException;
@@ -33,7 +32,6 @@ public class AlarmService {
     private final MemberRepository memberRepository;
     private final MedicinePerMemberRepository medicinePerMemberRepository;
     private final MedicineRepository medicineRepository;
-    private final FCMService fcmService;
 
     @Transactional
     public ResponseEntity<String> createAlarm(final Long memberId, final AlarmRequest alarmRequest) {
@@ -53,37 +51,21 @@ public class AlarmService {
                 .map(alarm -> {
                     MedicinePerMember medicineHistory = findByMemberIdAndMedicineId(memberId, alarm.getMedicine().getId());
                     return AlarmInfo.builder()
-                            .time(alarm.getTime())
-                            .medicineName(alarm.getMedicine().getName())
+                            .name(alarm.getMedicine().getName())
                             .category(alarm.getMedicine().getCategory())
                             .amount(medicineHistory.getAmount())
                             .timesPerDay(medicineHistory.getTimes())
                             .day(medicineHistory.getDay())
-                            .timeOfDay(medicineHistory.getTime())
+                            .timeSlotList(medicineHistory.getTimeSlots())
                             .isAvailable(alarm.getIsAvailable())
                             .build();
                 })
                 .collect(Collectors.toList());
     }
 
-    @Scheduled(fixedRate = 60000) // 매 60초마다 실행
-    public void checkAlarms() {
-        List<Alarm> dueAlarms = getAllDueAlarms();
-        for (Alarm alarm : dueAlarms) {
-            triggerAlarm(alarm);
-        }
-    }
-
     private List<Alarm> getAllDueAlarms() {
         LocalTime currentTime = LocalTime.now();
         return alarmRepository.findAllByTime(currentTime);
-    }
-
-    private void triggerAlarm(Alarm alarm) {
-        Medicine medicine = alarm.getMedicine();
-        if (medicine != null) {
-            fcmService.sendNotification(alarm.getMember().getId(), medicine);
-        }
     }
 
     private Member findByMemberId(Long memberId) {
