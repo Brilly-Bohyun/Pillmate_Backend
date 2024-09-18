@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pillmate.backend.common.exception.NotFoundException;
 import pillmate.backend.common.exception.errorcode.ErrorCode;
-import pillmate.backend.dto.alarm.AlarmRequest;
 import pillmate.backend.dto.medicine.AddDirectlyRequest;
 import pillmate.backend.dto.medicine.MedicineInfo;
 import pillmate.backend.dto.medicine.ModifyMedicineInfo;
@@ -45,12 +44,18 @@ public class MedicineService {
 
     @Transactional
     public void addDirectly(Long memberId, AddDirectlyRequest addDirectlyRequest) {
-        medicinePerMemberRepository.save(addDirectlyRequest.toEntity(findByMemberId(memberId), findByName(addDirectlyRequest.getMedicineName())));
+        Medicine newMedicine = medicineRepository.save(Medicine.builder()
+                .name(addDirectlyRequest.getMedicineName())
+                .category(addDirectlyRequest.getDisease())
+                .photo("white")
+                .build());
+
+        medicinePerMemberRepository.save(addDirectlyRequest.toEntity(findByMemberId(memberId), newMedicine));
 
         // 사용자가 선택한 시간대를 기준으로 알람 저장
-        LocalTime userTime = findByTime(findByMemberId(memberId), addDirectlyRequest.getTimeOfDay());
-        AlarmRequest alarmRequest = AlarmRequest.builder().medicineName(addDirectlyRequest.getMedicineName()).time(userTime).build();
-        alarmService.createAlarm(memberId, alarmRequest);
+//        LocalTime userTime = findByTime(findByMemberId(memberId), addDirectlyRequest.getTimeOfDay());
+//        AlarmRequest alarmRequest = AlarmRequest.builder().medicineName(addDirectlyRequest.getMedicineName()).time(userTime).build();
+//        alarmService.createAlarm(memberId, alarmRequest);
     }
 
     public List<MedicineInfo> showAll(Long memberId) {
@@ -62,8 +67,7 @@ public class MedicineService {
                         .amount(medicinePerMember.getAmount())
                         .timesPerDay(medicinePerMember.getTimes())
                         .day(medicinePerMember.getDay())
-                        .timeOfDay(medicinePerMember.getTime())
-                        .alarmTime(findByTime(findByMemberId(memberId), medicinePerMember.getTime()))
+                        .timeSlotList(medicinePerMember.getTimeSlots())
                         .build())
                 .sorted(Comparator.comparing(MedicineInfo::getName))
                 .collect(Collectors.toList());
@@ -75,9 +79,8 @@ public class MedicineService {
         MedicinePerMember medicinePerMember = findByMemberIdAndMedicineId(memberId, medicine.getId());
         medicinePerMember.update(modifyMedicineInfo.getAmount(),
                 modifyMedicineInfo.getTimesPerDay(),
-                modifyMedicineInfo.getMonth(),
                 modifyMedicineInfo.getDay(),
-                modifyMedicineInfo.getTimeOfDay());
+                modifyMedicineInfo.getTimeSlotList());
     }
 
     private List<MedicinePerMember> findAllByMemberId(Long memberId) {
@@ -94,23 +97,5 @@ public class MedicineService {
 
     private Medicine findByName(String name) {
         return medicineRepository.findByName(name).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_MEDICINE));
-    }
-
-    private LocalTime findByTime(Member member, String time) {
-        if (time.equals("기상 직후")) {
-            return member.getWakeUp().plusMinutes(5);
-        } else if (time.equals("아침 식후")) {
-            return member.getMorning().plusMinutes(5);
-        } else if (time.equals("점심 식전")) {
-            return member.getLunch().minusMinutes(5);
-        } else if (time.equals("점심 식후")) {
-            return member.getLunch().plusMinutes(5);
-        } else if (time.equals("저녁 식전")) {
-            return member.getDinner().minusMinutes(5);
-        } else if (time.equals("저녁 식후")) {
-            return member.getDinner().plusMinutes(5);
-        } else {
-            return member.getBed().minusMinutes(5);
-        }
     }
 }

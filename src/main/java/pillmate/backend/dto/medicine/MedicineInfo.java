@@ -2,8 +2,9 @@ package pillmate.backend.dto.medicine;
 
 import lombok.Builder;
 import lombok.Data;
+import pillmate.backend.entity.TimeSlot;
 
-import java.time.LocalTime;
+import java.util.List;
 
 @Builder
 @Data
@@ -13,8 +14,6 @@ public class MedicineInfo {
     private String category;
     private Integer amount;
     private Integer timesPerDay;
-    private Integer month;
     private Integer day;
-    private String timeOfDay;
-    private LocalTime alarmTime;
+    private List<TimeSlot> timeSlotList;
 }

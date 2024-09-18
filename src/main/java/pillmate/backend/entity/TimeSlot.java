@@ -5,33 +5,30 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalTime;
+
+@AllArgsConstructor
+@Builder
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Medicine {
+public class TimeSlot {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false)
-    private String name;
+    // 투여시간대
+    @Column(name = "spinner_time", nullable = false)
+    private String spinnerTime;
 
-    @Column(name = "category", nullable = true)
-    private String category;
-
-    @Column(name = "photo", nullable = true)
-    private String photo;
-
-    @Builder
-    public Medicine(Long id, String name, String category, String photo) {
-        this.id = id;
-        this.name = name;
-        this.category = category;
-        this.photo = photo;
-    }
+    // 투여시간
+    @Column(name = "picker_time", nullable = false)
+    private LocalTime pickerTime;
 }

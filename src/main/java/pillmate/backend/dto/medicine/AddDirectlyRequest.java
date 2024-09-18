@@ -4,26 +4,37 @@ import lombok.Builder;
 import lombok.Data;
 import pillmate.backend.entity.Medicine;
 import pillmate.backend.entity.MedicinePerMember;
+import pillmate.backend.entity.TimeSlot;
 import pillmate.backend.entity.member.Member;
+
+import java.util.List;
 
 @Builder
 @Data
 public class AddDirectlyRequest {
     private String medicineName;
+    private String disease;
     private Integer amount;
     private Integer timesPerDay;
-    private Integer month;
     private Integer day;
-    private String timeOfDay;
+    private List<TimeSlot> timeSlotList;
 
     public MedicinePerMember toEntity(Member member, Medicine medicine) {
-        return MedicinePerMember.builder()
+        MedicinePerMember medicinePerMember = MedicinePerMember.builder()
                 .member(member)
                 .medicine(medicine)
                 .amount(amount)
                 .times(timesPerDay)
                 .day(day)
-                .time(timeOfDay)
                 .build();
+
+        timeSlotList.stream().map(
+                t -> TimeSlot.builder()
+                        .spinnerTime(t.getSpinnerTime())
+                        .pickerTime(t.getPickerTime())
+                        .build()
+        ).forEach(medicinePerMember::addTimeSlot);
+
+        return medicinePerMember;
     }
 }

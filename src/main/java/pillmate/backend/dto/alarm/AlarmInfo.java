@@ -2,18 +2,18 @@ package pillmate.backend.dto.alarm;
 
 import lombok.Builder;
 import lombok.Data;
+import pillmate.backend.entity.TimeSlot;
 
-import java.time.LocalTime;
+import java.util.List;
 
 @Builder
 @Data
 public class AlarmInfo {
-    private LocalTime time;
-    private String medicineName;
+    private String name;
     private String category;
     private Integer amount;
     private Integer timesPerDay;
     private Integer day;
+    private List<TimeSlot> timeSlotList;
     private Boolean isAvailable;
-    private String timeOfDay;
 }

@@ -1,5 +1,7 @@
 package pillmate.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -8,11 +10,15 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import pillmate.backend.entity.member.Member;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -41,26 +47,32 @@ public class MedicinePerMember {
     @Column(name = "day", nullable = false)
     private Integer day;
 
-    // 투여시간
-    @Column(name = "time", nullable = false)
-    private String time;
+    // 투여시간대
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<TimeSlot> timeSlots = new ArrayList<>();
+
+    public void addTimeSlot(TimeSlot timeSlot) {
+        if (timeSlot != null) {
+            timeSlots.add(timeSlot);
+        }
+    }
 
     @Builder
-    public MedicinePerMember(Long id, Member member, Medicine medicine, Integer amount, Integer times, Integer day, String time) {
+    public MedicinePerMember(Long id, Member member, Medicine medicine, Integer amount, Integer times, Integer day) {
         this.id = id;
         this.member = member;
         this.medicine = medicine;
         this.amount = amount;
         this.times = times;
         this.day = day;
-        this.time = time;
     }
 
-    public void update(final Integer amount, final Integer times, final Integer month, final Integer date, final String time) {
+    public void update(final Integer amount, final Integer times, final Integer day, final List<TimeSlot> timeSlots) {
         updateAmount(amount);
         updateTimes(times);
-        updateDate(date);
-        updateTime(time);
+        updateDay(day);
+        updateTimeSlots(timeSlots);
     }
 
     private void updateAmount(Integer amount) {
@@ -75,15 +87,16 @@ public class MedicinePerMember {
         }
     }
 
-    private void updateDate(Integer date) {
-        if (date != null) {
-            this.day = date;
+    private void updateDay(Integer day) {
+        if (day != null) {
+            this.day = day;
         }
     }
 
-    private void updateTime(String time) {
-        if (time != null) {
-            this.time = time;
+    private void updateTimeSlots(List<TimeSlot> timeSlots) {
+        if (timeSlots != null) {
+            this.timeSlots.clear();
+            this.timeSlots.addAll(timeSlots);
         }
     }
 }

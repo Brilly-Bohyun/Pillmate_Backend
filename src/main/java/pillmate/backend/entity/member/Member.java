@@ -21,7 +21,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -64,7 +63,7 @@ public class Member implements UserDetails {
     private Boolean usable;
 
     @Builder
-    public Member(Long id, String email, String name, String password, LocalTime wakeUp, LocalTime morning, LocalTime lunch, LocalTime dinner, LocalTime bed, MemberType type, Long providerId, Boolean usable) {
+    public Member(Long id, String email, String name, String password, MemberType type, Long providerId, Boolean usable) {
         this.id = id;
         this.email = email;
         this.name = name;
