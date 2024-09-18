@@ -1,11 +1,8 @@
 package pillmate.backend.entity.member;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
@@ -14,8 +11,6 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.MapKeyColumn;
 import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -26,13 +21,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Getter
@@ -52,21 +44,6 @@ public class Member implements UserDetails {
 
     @Column(name = "password", nullable = true)
     private String password;
-
-    @Column(name = "wake_up", nullable = false)
-    private LocalTime wakeUp;
-
-    @Column(name = "morning", nullable = false)
-    private LocalTime morning;
-
-    @Column(name = "lunch", nullable = false)
-    private LocalTime lunch;
-
-    @Column(name = "dinner", nullable = false)
-    private LocalTime dinner;
-
-    @Column(name = "bed", nullable = false)
-    private LocalTime bed;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
@@ -92,11 +69,6 @@ public class Member implements UserDetails {
         this.email = email;
         this.name = name;
         this.password = password;
-        this.wakeUp = wakeUp;
-        this.morning = morning;
-        this.lunch = lunch;
-        this.dinner = dinner;
-        this.bed = bed;
         this.type = type;
         this.providerId = providerId;
         this.usable = usable;

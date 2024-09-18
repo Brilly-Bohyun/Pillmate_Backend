@@ -14,7 +14,6 @@ import pillmate.backend.entity.member.MemberRole;
 import pillmate.backend.entity.member.MemberType;
 import pillmate.backend.entity.member.Role;
 
-import java.time.LocalTime;
 import java.util.List;
 
 @AllArgsConstructor
@@ -30,16 +29,6 @@ public class SignUpRequest {
     @NotBlank(message = "이름은 공백일 수 없습니다.")
     private String name;
 
-    private LocalTime wakeUp;
-
-    private LocalTime morning;
-
-    private LocalTime lunch;
-
-    private LocalTime dinner;
-
-    private LocalTime bed;
-
     @NotNull(message = "질병은 필수입니다.")
     private List<Disease> diseases;
 
@@ -52,11 +41,6 @@ public class SignUpRequest {
                 .email(email)
                 .password(encodedPassword)
                 .name(name)
-                .wakeUp(wakeUp)
-                .morning(morning)
-                .lunch(lunch)
-                .dinner(dinner)
-                .bed(bed)
                 .type(MemberType.DEFAULT)
                 .usable(true)
                 .build();
