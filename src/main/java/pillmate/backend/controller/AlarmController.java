@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import pillmate.backend.common.util.LoggedInMember;
 import pillmate.backend.dto.alarm.AlarmInfo;
 import pillmate.backend.dto.alarm.AlarmRequest;
-import pillmate.backend.service.alarm.AlarmService;
+import pillmate.backend.service.AlarmService;
 
 import java.util.List;
 
