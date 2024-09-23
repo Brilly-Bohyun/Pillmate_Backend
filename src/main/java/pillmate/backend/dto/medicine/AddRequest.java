@@ -11,7 +11,7 @@ import java.util.List;
 
 @Builder
 @Data
-public class AddDirectlyRequest {
+public class AddRequest {
     private String medicineName;
     private String disease;
     private Integer amount;

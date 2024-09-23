@@ -6,23 +6,25 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pillmate.backend.common.exception.NotFoundException;
 import pillmate.backend.common.exception.errorcode.ErrorCode;
-import pillmate.backend.dto.medicine.AddDirectlyRequest;
+import pillmate.backend.dto.alarm.AlarmRequest;
+import pillmate.backend.dto.medicine.AddRequest;
 import pillmate.backend.dto.medicine.MedicineInfo;
 import pillmate.backend.dto.medicine.ModifyMedicineInfo;
 import pillmate.backend.dto.medicine.UpcomingAlarm;
 import pillmate.backend.entity.Alarm;
 import pillmate.backend.entity.Medicine;
 import pillmate.backend.entity.MedicinePerMember;
+import pillmate.backend.entity.TimeSlot;
 import pillmate.backend.entity.member.Member;
 import pillmate.backend.repository.AlarmRepository;
 import pillmate.backend.repository.MedicinePerMemberRepository;
 import pillmate.backend.repository.MedicineRepository;
 import pillmate.backend.repository.MemberRepository;
-import pillmate.backend.service.alarm.AlarmService;
 
 import java.time.LocalTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -36,26 +38,43 @@ public class MedicineService {
     private final MemberRepository memberRepository;
     private final MedicinePerMemberRepository medicinePerMemberRepository;
 
-
     public UpcomingAlarm getUpcomingAlarm(Long memberId) {
         Alarm alarm = alarmRepository.findUpcomingAlarmsByMemberId(memberId, LocalTime.now()).stream().findFirst().orElse(null);
+        if (alarm == null) {
+            throw new NotFoundException(ErrorCode.NOT_FOUND_ALARM);
+        }
+
         return UpcomingAlarm.builder().medicineName(alarm.getMedicine().getName()).time(alarm.getTime()).build();
     }
 
     @Transactional
-    public void addDirectly(Long memberId, AddDirectlyRequest addDirectlyRequest) {
-        Medicine newMedicine = medicineRepository.save(Medicine.builder()
-                .name(addDirectlyRequest.getMedicineName())
-                .category(addDirectlyRequest.getDisease())
+    public void add(Long memberId, AddRequest addRequest) {
+        Optional<Medicine> foundmedicine = medicineRepository.findByName(addRequest.getMedicineName());
+        Medicine newMedicine;
+        newMedicine = foundmedicine.orElseGet(() -> medicineRepository.save(Medicine.builder()
+                .name(addRequest.getMedicineName())
+                .category(addRequest.getDisease())
                 .photo("white")
-                .build());
+                .build()));
 
-        medicinePerMemberRepository.save(addDirectlyRequest.toEntity(findByMemberId(memberId), newMedicine));
+        saveMedicinePerMember(addRequest.toEntity(findByMemberId(memberId), newMedicine));
 
-        // 사용자가 선택한 시간대를 기준으로 알람 저장
-//        LocalTime userTime = findByTime(findByMemberId(memberId), addDirectlyRequest.getTimeOfDay());
-//        AlarmRequest alarmRequest = AlarmRequest.builder().medicineName(addDirectlyRequest.getMedicineName()).time(userTime).build();
-//        alarmService.createAlarm(memberId, alarmRequest);
+        saveAlarmList(addRequest.getTimeSlotList(), addRequest.getMedicineName(), memberId);
+    }
+
+    private void saveAlarmList(List<TimeSlot> addRequest, String medicineName, Long memberId) {
+        List<AlarmRequest> alarmList = addRequest.stream().map(
+                t -> AlarmRequest.builder()
+                        .medicineName(medicineName)
+                        .timeZone(t.getSpinnerTime())
+                        .time(t.getPickerTime())
+                        .build()
+        ).toList();
+        alarmService.createAlarm(memberId, alarmList);
+    }
+
+    private void saveMedicinePerMember(MedicinePerMember addRequest) {
+        medicinePerMemberRepository.save(addRequest);
     }
 
     public List<MedicineInfo> showAll(Long memberId) {

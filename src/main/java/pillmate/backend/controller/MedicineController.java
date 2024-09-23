@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pillmate.backend.common.util.LoggedInMember;
-import pillmate.backend.dto.medicine.AddDirectlyRequest;
+import pillmate.backend.dto.medicine.AddRequest;
 import pillmate.backend.dto.medicine.MedicineInfo;
 import pillmate.backend.dto.medicine.ModifyMedicineInfo;
 import pillmate.backend.dto.medicine.UpcomingAlarm;
@@ -32,9 +32,9 @@ public class MedicineController {
         return medicineService.getUpcomingAlarm(memberId);
     }
 
-    @PostMapping("/directly")
-    public ResponseEntity<String> addDirectly(@LoggedInMember Long memberId, @RequestBody AddDirectlyRequest addDirectlyRequest) {
-        medicineService.addDirectly(memberId, addDirectlyRequest);
+    @PostMapping
+    public ResponseEntity<String> add(@LoggedInMember Long memberId, @RequestBody AddRequest addRequest) {
+        medicineService.add(memberId, addRequest);
         return ResponseEntity.ok("알약 저장이 완료되었습니다.");
     }
 
