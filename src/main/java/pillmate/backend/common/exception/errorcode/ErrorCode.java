@@ -35,7 +35,8 @@ public enum ErrorCode {
     INVALID_PAGE_NUMBER("잘못된 페이지 번호입니다."),
     INVALID_REQUEST_PARAM("파라미터가 잘못되었습니다."),
     NOT_FOUND_PAGE("페이지가 없습니다."),
-    INVALID_PAGE_SIZE("page size는 양수여야 합니다.");
+    INVALID_PAGE_SIZE("page size는 양수여야 합니다."),
+    NOT_FOUND_ALARM("활성화된 알람이 없습니다.");
 
     private final String message;
     ErrorCode(String message) {
