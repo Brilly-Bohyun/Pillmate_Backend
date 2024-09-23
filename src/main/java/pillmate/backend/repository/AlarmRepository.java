@@ -11,7 +11,10 @@ import java.util.List;
 public interface AlarmRepository extends JpaRepository<Alarm, Long> {
     List<Alarm> findAllByMemberId(Long memberId);
     List<Alarm> findAllByTime(LocalTime currentTime);
-    @Query("SELECT a FROM Alarm a WHERE a.member.id = :memberId AND a.time > :currentTime AND a.isAvailable = true ORDER BY a.time ASC")
+    @Query("SELECT a FROM Alarm a " +
+            "WHERE a.member.id = :memberId " +
+            "AND a.isAvailable = true " +
+            "ORDER BY CASE WHEN a.time > :currentTime THEN 0 ELSE 1 END, a.time ASC")
     List<Alarm> findUpcomingAlarmsByMemberId(@Param("memberId") Long memberId, @Param("currentTime") LocalTime currentTime);
 
 }

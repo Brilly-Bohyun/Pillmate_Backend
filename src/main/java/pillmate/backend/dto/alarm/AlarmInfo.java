@@ -9,6 +9,7 @@ import java.util.List;
 @Builder
 @Data
 public class AlarmInfo {
+    private Long id;
     private String name;
     private String category;
     private Integer amount;

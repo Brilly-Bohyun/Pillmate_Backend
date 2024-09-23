@@ -34,13 +34,16 @@ public class AlarmService {
     private final MedicineRepository medicineRepository;
 
     @Transactional
-    public ResponseEntity<String> createAlarm(final Long memberId, final AlarmRequest alarmRequest) {
-        Alarm alarm = Alarm.builder()
-                .member(findByMemberId(memberId))
-                .medicine(findByMedicineName(alarmRequest.getMedicineName()))
-                .time(alarmRequest.getTime())
-                .build();
-        alarmRepository.save(alarm);
+    public ResponseEntity<String> createAlarm(final Long memberId, final List<AlarmRequest> alarmRequest) {
+        alarmRequest.stream().map(
+                a -> Alarm.builder()
+                        .member(findByMemberId(memberId))
+                        .medicine(findByMedicineName(a.getMedicineName()))
+                        .timeZone(a.getTimeZone())
+                        .time(a.getTime())
+                        .build()
+        ).forEach(alarmRepository::save);
+
         return ResponseEntity.ok("알람이 생성되었습니다.");
     }
 
@@ -51,6 +54,7 @@ public class AlarmService {
                 .map(alarm -> {
                     MedicinePerMember medicineHistory = findByMemberIdAndMedicineId(memberId, alarm.getMedicine().getId());
                     return AlarmInfo.builder()
+                            .id(alarm.getId())
                             .name(alarm.getMedicine().getName())
                             .category(alarm.getMedicine().getCategory())
                             .amount(medicineHistory.getAmount())
@@ -61,6 +65,11 @@ public class AlarmService {
                             .build();
                 })
                 .collect(Collectors.toList());
+    }
+
+    public ResponseEntity<String> updateAvailability(Long alarmId, Boolean available, Long memberId) {
+        findByAlarmId(alarmId).updateAvailability(available);
+        return ResponseEntity.ok("알람 on/off 설정이 변경되었습니다.");
     }
 
     private List<Alarm> getAllDueAlarms() {
@@ -80,4 +89,7 @@ public class AlarmService {
         return medicinePerMemberRepository.findByMemberIdAndMedicineId(memberId, medicineId);
     }
 
+    private Alarm findByAlarmId(Long alarmId) {
+        return alarmRepository.findById(alarmId).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_ALARM));
+    }
 }
