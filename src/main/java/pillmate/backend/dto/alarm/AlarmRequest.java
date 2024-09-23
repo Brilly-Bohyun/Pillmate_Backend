@@ -9,5 +9,6 @@ import java.time.LocalTime;
 @Data
 public class AlarmRequest {
     private String medicineName;
+    private String timeZone;
     private LocalTime time;
 }

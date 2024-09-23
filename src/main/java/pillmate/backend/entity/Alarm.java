@@ -39,6 +39,9 @@ public class Alarm {
     @Column(name = "time", nullable = false)
     private LocalTime time;
 
+    @Column(name = "time_zone", nullable = false)
+    private String timeZone;
+
     @Builder.Default
     @Column(name = "isEaten", nullable = false)
     private Boolean isEaten = FALSE;
@@ -48,12 +51,19 @@ public class Alarm {
     private Boolean isAvailable = TRUE;
 
     @Builder
-    public Alarm(Long id, Member member, Medicine medicine, LocalTime time, Boolean isEaten, Boolean isAvailable) {
+    public Alarm(Long id, Member member, Medicine medicine, LocalTime time, String timeZone, Boolean isEaten, Boolean isAvailable) {
         this.id = id;
         this.member = member;
         this.medicine = medicine;
         this.time = time;
+        this.timeZone = timeZone;
         this.isEaten = isEaten;
         this.isAvailable = isAvailable;
+    }
+
+    public void updateAvailability(Boolean isAvailable) {
+        if (isAvailable != null) {
+            this.isAvailable = isAvailable;
+        }
     }
 }
