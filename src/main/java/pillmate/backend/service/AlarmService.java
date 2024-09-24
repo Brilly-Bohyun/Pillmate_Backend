@@ -60,7 +60,8 @@ public class AlarmService {
                             .amount(medicineHistory.getAmount())
                             .timesPerDay(medicineHistory.getTimes())
                             .day(medicineHistory.getDay())
-                            .timeSlotList(medicineHistory.getTimeSlots())
+                            .timeSlot(
+                                    medicineHistory.getTimeSlots().stream().filter(timeSlot -> timeSlot.getId().equals(alarm.getId())).findFirst().get())
                             .isAvailable(alarm.getIsAvailable())
                             .build();
                 })
