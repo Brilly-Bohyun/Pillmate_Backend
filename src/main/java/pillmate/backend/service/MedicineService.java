@@ -8,8 +8,10 @@ import pillmate.backend.common.exception.NotFoundException;
 import pillmate.backend.common.exception.errorcode.ErrorCode;
 import pillmate.backend.dto.alarm.AlarmRequest;
 import pillmate.backend.dto.medicine.AddRequest;
+import pillmate.backend.dto.medicine.MedicineBasicInfo;
 import pillmate.backend.dto.medicine.MedicineInfo;
 import pillmate.backend.dto.medicine.ModifyMedicineInfo;
+import pillmate.backend.dto.medicine.PrescriptionRequest;
 import pillmate.backend.dto.medicine.UpcomingAlarm;
 import pillmate.backend.entity.Alarm;
 import pillmate.backend.entity.Medicine;
@@ -45,6 +47,24 @@ public class MedicineService {
         }
 
         return UpcomingAlarm.builder().medicineName(alarm.getMedicine().getName()).time(alarm.getTime()).build();
+    }
+
+    public List<MedicineBasicInfo> getMedicineInfo(Long memberId, List<PrescriptionRequest> nameList) {
+        return nameList.stream()
+                .map(p -> medicineRepository.findByName(p.getName())
+                        .map(m -> MedicineBasicInfo.builder()
+                                .name(m.getName())
+                                .photo(m.getPhoto())
+                                .category(m.getCategory())
+                                .build()
+                        )
+                        .orElse(MedicineBasicInfo.builder()
+                                .name(p.getName())
+                                .photo("db에서 해당 약을 찾을 수 없습니다")
+                                .category("db에서 해당 약을 찾을 수 없습니다")
+                                .build())
+                )
+                .collect(Collectors.toList());
     }
 
     @Transactional

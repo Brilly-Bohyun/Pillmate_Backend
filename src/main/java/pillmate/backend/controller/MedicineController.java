@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pillmate.backend.common.util.LoggedInMember;
 import pillmate.backend.dto.medicine.AddRequest;
+import pillmate.backend.dto.medicine.MedicineBasicInfo;
 import pillmate.backend.dto.medicine.MedicineInfo;
 import pillmate.backend.dto.medicine.ModifyMedicineInfo;
+import pillmate.backend.dto.medicine.PrescriptionRequest;
 import pillmate.backend.dto.medicine.UpcomingAlarm;
 import pillmate.backend.repository.MedicinePerMemberRepository;
 import pillmate.backend.service.MedicineService;
@@ -25,11 +27,15 @@ import java.util.List;
 @RequestMapping("/api/v1/medicines")
 public class MedicineController {
     private final MedicineService medicineService;
-    private final MedicinePerMemberRepository medicinePerMemberRepository;
 
     @GetMapping
     public UpcomingAlarm getUpcomingAlarm(@LoggedInMember Long memberId) {
         return medicineService.getUpcomingAlarm(memberId);
+    }
+
+    @GetMapping("/name")
+    public List<MedicineBasicInfo> getMedicineBasicInfo(@LoggedInMember Long memberId, @RequestBody List<PrescriptionRequest> nameList) {
+        return medicineService.getMedicineInfo(memberId, nameList);
     }
 
     @PostMapping
