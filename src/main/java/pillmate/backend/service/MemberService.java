@@ -2,6 +2,7 @@ package pillmate.backend.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pillmate.backend.common.exception.BadRequestException;
@@ -13,6 +14,7 @@ import pillmate.backend.dto.member.JwtTokenResponse;
 import pillmate.backend.dto.member.LoginResponse;
 import pillmate.backend.dto.member.LogoutResponse;
 import pillmate.backend.dto.member.ModifyPasswordRequest;
+import pillmate.backend.dto.member.MyHealthInfo;
 import pillmate.backend.dto.member.SignUpRequest;
 import pillmate.backend.entity.member.Member;
 import pillmate.backend.entity.member.MemberType;
@@ -172,6 +174,20 @@ public class MemberService {
 
         JwtTokenResponse tokenInfo = jwtTokenProvider.generateToken(member);
         return LoginResponse.from(tokenInfo, member);
+    }
+
+    public MyHealthInfo getHealthInfo(Long memberId) {
+        Member member = findMemberById(memberId);
+        return MyHealthInfo.builder()
+                .diseases(member.getDiseases())
+                .symptoms(member.getSymptoms())
+                .build();
+    }
+
+    @Transactional
+    public ResponseEntity<String> modifyHealthInfo(Long memberId, MyHealthInfo modifyHealthInfo) {
+        findMemberById(memberId).updateHealthInfo(modifyHealthInfo.getDiseases(), modifyHealthInfo.getSymptoms());
+        return ResponseEntity.ok("수정이 완료되었습니다.");
     }
 
     private Member findMemberById(Long memberId) {

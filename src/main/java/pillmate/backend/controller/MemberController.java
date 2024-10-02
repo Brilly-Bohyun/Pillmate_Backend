@@ -4,7 +4,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +21,7 @@ import pillmate.backend.dto.member.LoginRequest;
 import pillmate.backend.dto.member.LoginResponse;
 import pillmate.backend.dto.member.LogoutResponse;
 import pillmate.backend.dto.member.ModifyPasswordRequest;
+import pillmate.backend.dto.member.MyHealthInfo;
 import pillmate.backend.dto.member.SignUpRequest;
 import pillmate.backend.service.MemberService;
 
@@ -59,5 +62,15 @@ public class MemberController {
     @PatchMapping("/password")
     public void modifyPassword(@LoggedInMember Long memberId, @RequestBody ModifyPasswordRequest modifyPasswordRequest) {
         memberService.modifyPassword(memberId, modifyPasswordRequest);
+    }
+
+    @GetMapping("/healthinfo")
+    public MyHealthInfo healthInfo(@LoggedInMember Long memberId) {
+        return memberService.getHealthInfo(memberId);
+    }
+
+    @PatchMapping("/healthinfo")
+    public ResponseEntity<String> updateHealthInfo(@LoggedInMember Long memberId, @RequestBody MyHealthInfo modifyHealthInfo) {
+        return memberService.modifyHealthInfo(memberId, modifyHealthInfo);
     }
 }
