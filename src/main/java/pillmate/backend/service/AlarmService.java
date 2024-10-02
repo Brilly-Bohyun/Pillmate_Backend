@@ -51,19 +51,21 @@ public class AlarmService {
         List<Alarm> alarms = alarmRepository.findAllByMemberId(memberId);
         return alarms.stream()
                 .sorted(Comparator.comparing(Alarm::getTime))
-                .map(alarm -> {
+                .flatMap(alarm -> {
                     MedicinePerMember medicineHistory = findByMemberIdAndMedicineId(memberId, alarm.getMedicine().getId());
-                    return AlarmInfo.builder()
-                            .id(alarm.getId())
-                            .name(alarm.getMedicine().getName())
-                            .category(alarm.getMedicine().getCategory())
-                            .amount(medicineHistory.getAmount())
-                            .timesPerDay(medicineHistory.getTimes())
-                            .day(medicineHistory.getDay())
-                            .timeSlot(
-                                    medicineHistory.getTimeSlots().stream().filter(timeSlot -> timeSlot.getId().equals(alarm.getId())).findFirst().get())
-                            .isAvailable(alarm.getIsAvailable())
-                            .build();
+
+                    // MedicineHistory에서 모든 timeSlots를 AlarmInfo로 변환
+                    return medicineHistory.getTimeSlots().stream()
+                            .map(timeSlot -> AlarmInfo.builder()
+                                    .id(alarm.getId())
+                                    .name(alarm.getMedicine().getName())
+                                    .category(alarm.getMedicine().getCategory())
+                                    .amount(medicineHistory.getAmount())
+                                    .timesPerDay(medicineHistory.getTimes())
+                                    .day(medicineHistory.getDay())
+                                    .timeSlot(timeSlot) // 여러 timeSlot 중 하나씩 AlarmInfo에 추가
+                                    .isAvailable(alarm.getIsAvailable())
+                                    .build());
                 })
                 .collect(Collectors.toList());
     }
