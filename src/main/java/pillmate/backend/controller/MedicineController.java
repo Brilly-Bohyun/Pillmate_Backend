@@ -16,7 +16,6 @@ import pillmate.backend.dto.medicine.MedicineInfo;
 import pillmate.backend.dto.medicine.ModifyMedicineInfo;
 import pillmate.backend.dto.medicine.PrescriptionRequest;
 import pillmate.backend.dto.medicine.UpcomingAlarm;
-import pillmate.backend.repository.MedicinePerMemberRepository;
 import pillmate.backend.service.MedicineService;
 
 import java.util.List;
@@ -33,7 +32,7 @@ public class MedicineController {
         return medicineService.getUpcomingAlarm(memberId);
     }
 
-    @GetMapping("/name")
+    @PostMapping("/name")
     public List<MedicineBasicInfo> getMedicineBasicInfo(@LoggedInMember Long memberId, @RequestBody List<PrescriptionRequest> nameList) {
         return medicineService.getMedicineInfo(memberId, nameList);
     }
