@@ -32,6 +32,9 @@ public class SignUpRequest {
     @NotNull(message = "질병은 필수입니다.")
     private List<Disease> diseases;
 
+    @NotNull(message = "증상은 필수입니다.")
+    private List<String> symptoms;
+
     @NotNull(message = "권한은 필수입니다.")
     @Size(min = 1, message = "권한은 최소 1개 이상이여야 합니다.")
     private List<String> roles;
@@ -57,6 +60,8 @@ public class SignUpRequest {
                         .startDate(d.getStartDate())
                         .build()
         ).forEach(member::addDisease);
+
+        member.getSymptoms().addAll(symptoms);
 
         return member;
     }
