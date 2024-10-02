@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pillmate.backend.common.exception.BadRequestException;
 import pillmate.backend.common.exception.NotFoundException;
 import pillmate.backend.common.util.JwtTokenProvider;
+import pillmate.backend.dto.member.CheckPasswordRequest;
 import pillmate.backend.dto.member.FindPasswordRequest;
 import pillmate.backend.dto.member.FindPasswordResponse;
 import pillmate.backend.dto.member.JwtTokenResponse;
@@ -128,6 +129,11 @@ public class MemberService {
         return FindPasswordResponse.builder()
                 .tempPassword(temporaryPassword)
                 .build();
+    }
+
+    public Boolean checkPassword(Long memberId, CheckPasswordRequest checkPasswordRequest) {
+        Member member = findMemberById(memberId);
+        return passwordEncoder.matches(checkPasswordRequest.getPassword(), member.getPassword());
     }
 
     @Transactional

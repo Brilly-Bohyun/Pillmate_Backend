@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pillmate.backend.common.util.LoggedInMember;
+import pillmate.backend.dto.member.CheckPasswordRequest;
 import pillmate.backend.dto.member.FindPasswordRequest;
 import pillmate.backend.dto.member.FindPasswordResponse;
 import pillmate.backend.dto.member.JwtTokenResponse;
@@ -44,11 +45,6 @@ public class MemberController {
         return memberService.issueToken(loginRequest.getEmail(), loginRequest.getPassword());
     }
 
-    @PostMapping("/password")
-    public FindPasswordResponse findPassword(@RequestBody @Valid FindPasswordRequest findPasswordRequest) {
-        return memberService.issueTemporaryPassword(findPasswordRequest);
-    }
-
     @PostMapping("/logout")
     public LogoutResponse logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken) {
         return memberService.expireToken(accessToken);
@@ -57,6 +53,16 @@ public class MemberController {
     @PostMapping("/reissue")
     public LoginResponse reissue(@LoggedInMember Long memberId, @CookieValue(REFRESH_TOKEN) String refreshToken) {
         return memberService.reissueToken(memberId, refreshToken);
+    }
+
+    @PostMapping("/check/password")
+    public Boolean checkPassword(@LoggedInMember Long memberId, @RequestBody CheckPasswordRequest checkPasswordRequest) {
+        return memberService.checkPassword(memberId, checkPasswordRequest);
+    }
+
+    @PostMapping("/password")
+    public FindPasswordResponse findPassword(@RequestBody @Valid FindPasswordRequest findPasswordRequest) {
+        return memberService.issueTemporaryPassword(findPasswordRequest);
     }
 
     @PatchMapping("/password")
