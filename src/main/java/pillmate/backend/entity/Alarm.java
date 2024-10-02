@@ -12,7 +12,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import pillmate.backend.entity.member.Member;
 
 import java.time.LocalTime;
 
@@ -28,19 +27,9 @@ public class Alarm {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JoinColumn(name = "member_id", nullable = false)
+    @JoinColumn(name = "medicine_per_member_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
-    private Member member;
-
-    @JoinColumn(name = "medicinePerMember_id", nullable = false)
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Medicine medicine;
-
-    @Column(name = "time", nullable = false)
-    private LocalTime time;
-
-    @Column(name = "time_zone", nullable = false)
-    private String timeZone;
+    private MedicinePerMember medicinePerMember;
 
     @Builder.Default
     @Column(name = "isEaten", nullable = false)
@@ -51,12 +40,9 @@ public class Alarm {
     private Boolean isAvailable = TRUE;
 
     @Builder
-    public Alarm(Long id, Member member, Medicine medicine, LocalTime time, String timeZone, Boolean isEaten, Boolean isAvailable) {
+    public Alarm(Long id, MedicinePerMember medicinePerMember, Boolean isEaten, Boolean isAvailable) {
         this.id = id;
-        this.member = member;
-        this.medicine = medicine;
-        this.time = time;
-        this.timeZone = timeZone;
+        this.medicinePerMember = medicinePerMember;
         this.isEaten = isEaten;
         this.isAvailable = isAvailable;
     }

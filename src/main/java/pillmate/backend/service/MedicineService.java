@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import pillmate.backend.common.exception.BadRequestException;
 import pillmate.backend.common.exception.NotFoundException;
 import pillmate.backend.common.exception.errorcode.ErrorCode;
-import pillmate.backend.dto.alarm.AlarmRequest;
 import pillmate.backend.dto.medicine.AddRequest;
 import pillmate.backend.dto.medicine.MedicineBasicInfo;
 import pillmate.backend.dto.medicine.MedicineInfo;
@@ -17,7 +16,6 @@ import pillmate.backend.dto.medicine.UpcomingAlarm;
 import pillmate.backend.entity.Alarm;
 import pillmate.backend.entity.Medicine;
 import pillmate.backend.entity.MedicinePerMember;
-import pillmate.backend.entity.TimeSlot;
 import pillmate.backend.entity.member.Member;
 import pillmate.backend.repository.AlarmRepository;
 import pillmate.backend.repository.MedicinePerMemberRepository;
@@ -42,12 +40,13 @@ public class MedicineService {
     private final MedicinePerMemberRepository medicinePerMemberRepository;
 
     public UpcomingAlarm getUpcomingAlarm(Long memberId) {
-        Alarm alarm = alarmRepository.findUpcomingAlarmsByMemberId(memberId, LocalTime.now()).stream().findFirst().orElse(null);
+        Alarm alarm = alarmRepository.findNextUpcomingAlarmByMember(memberId, LocalTime.now()).orElse(null);
         if (alarm == null) {
             throw new NotFoundException(ErrorCode.NOT_FOUND_ALARM);
         }
 
-        return UpcomingAlarm.builder().medicineName(alarm.getMedicine().getName()).time(alarm.getTime()).build();
+        return UpcomingAlarm.builder().medicineName(alarm.getMedicinePerMember().getMedicine().getName())
+                                        .time(alarm.getMedicinePerMember().getTimeSlots().get(0).getPickerTime()).build();
     }
 
     public List<MedicineBasicInfo> getMedicineInfo(Long memberId, List<PrescriptionRequest> nameList) {
@@ -78,20 +77,12 @@ public class MedicineService {
                 .photo("white")
                 .build()));
 
-        saveMedicinePerMember(addRequest.toEntity(findByMemberId(memberId), newMedicine));
+        MedicinePerMember medicinePerMember = addRequest.toEntity(findByMemberId(memberId), newMedicine);
+        saveMedicinePerMember(medicinePerMember);
+        alarmRepository.save(Alarm.builder().medicinePerMember(medicinePerMember).build());
 
-        saveAlarmList(addRequest.getTimeSlotList(), addRequest.getMedicineName(), memberId);
-    }
 
-    private void saveAlarmList(List<TimeSlot> addRequest, String medicineName, Long memberId) {
-        List<AlarmRequest> alarmList = addRequest.stream().map(
-                t -> AlarmRequest.builder()
-                        .medicineName(medicineName)
-                        .timeZone(t.getSpinnerTime())
-                        .time(t.getPickerTime())
-                        .build()
-        ).toList();
-        alarmService.createAlarm(memberId, alarmList);
+        //saveAlarmList(addRequest.getTimeSlotList(), addRequest.getMedicineName(), memberId);
     }
 
     private void saveMedicinePerMember(MedicinePerMember addRequest) {

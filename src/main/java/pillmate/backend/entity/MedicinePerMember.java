@@ -95,8 +95,19 @@ public class MedicinePerMember {
 
     private void updateTimeSlots(List<TimeSlot> timeSlots) {
         if (timeSlots != null) {
-            this.timeSlots.clear();
-            this.timeSlots.addAll(timeSlots);
+            // 기존 항목과 새로운 항목 비교하여 업데이트
+            for (TimeSlot newSlot : timeSlots) {
+                boolean exists = this.timeSlots.stream()
+                        .anyMatch(existingSlot -> existingSlot.getPickerTime().equals(newSlot.getPickerTime())); // time 속성으로 비교
+                if (!exists) {
+                    this.timeSlots.add(newSlot); // 새로운 항목 추가
+                }
+
+                // 새로운 리스트에 없는 기존 항목 제거 (time으로 비교)
+                this.timeSlots.removeIf(existingSlot ->
+                        timeSlots.stream().noneMatch(ns -> ns.getPickerTime().equals(existingSlot.getPickerTime()))
+                );
+            }
         }
     }
 }

@@ -7,15 +7,34 @@ import pillmate.backend.entity.Alarm;
 
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface AlarmRepository extends JpaRepository<Alarm, Long> {
-    List<Alarm> findAllByMemberId(Long memberId);
-    List<Alarm> findAllByTime(LocalTime currentTime);
     @Query("SELECT a FROM Alarm a " +
-            "WHERE a.member.id = :memberId " +
-            "AND a.isAvailable = true " +
-            "ORDER BY CASE WHEN a.time > :currentTime THEN 0 ELSE 1 END, a.time ASC")
-    List<Alarm> findUpcomingAlarmsByMemberId(@Param("memberId") Long memberId, @Param("currentTime") LocalTime currentTime);
+            "JOIN a.medicinePerMember mpm " +
+            "JOIN mpm.member m " +
+            "WHERE m.id = :memberId")
+    List<Alarm> findAllByMemberId(@Param("memberId") Long memberId);
 
-    List<Alarm> findAllByMemberIdAndMedicineName(Long memberId, String medicineName);
+    //List<Alarm> findAllByTime(LocalTime currentTime);
+    @Query("SELECT a FROM Alarm a " +
+            "JOIN a.medicinePerMember mpm " +
+            "JOIN mpm.member m " +
+            "JOIN mpm.timeSlots ts " +
+            "WHERE m.id = :memberId " +
+            "AND ts.pickerTime > :currentTime " +
+            "AND a.isAvailable = TRUE " +
+            "AND a.isEaten = FALSE " +
+            "ORDER BY ts.pickerTime ASC")
+    Optional<Alarm> findNextUpcomingAlarmByMember(@Param("memberId") Long memberId,
+                                                  @Param("currentTime") LocalTime currentTime);
+
+    @Query("SELECT a FROM Alarm a " +
+            "JOIN a.medicinePerMember mpm " +
+            "JOIN mpm.member m " +
+            "JOIN mpm.medicine med " +
+            "WHERE m.id = :memberId " +
+            "AND med.name = :medicineName")
+    List<Alarm> findAllByMemberIdAndMedicineName(@Param("memberId") Long memberId,
+                                                 @Param("medicineName") String medicineName);
 }
