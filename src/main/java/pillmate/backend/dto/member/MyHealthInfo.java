@@ -1,9 +1,9 @@
 package pillmate.backend.dto.member;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 import pillmate.backend.entity.member.Disease;
+import pillmate.backend.entity.member.Symptom;
 
 import java.util.List;
 
@@ -11,5 +11,5 @@ import java.util.List;
 @Data
 public class MyHealthInfo {
     private List<Disease> diseases;
-    private List<String> symptoms;
+    private List<Symptom> symptoms;
 }

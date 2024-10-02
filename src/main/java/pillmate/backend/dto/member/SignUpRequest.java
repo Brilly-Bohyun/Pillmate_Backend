@@ -13,6 +13,7 @@ import pillmate.backend.entity.member.Member;
 import pillmate.backend.entity.member.MemberRole;
 import pillmate.backend.entity.member.MemberType;
 import pillmate.backend.entity.member.Role;
+import pillmate.backend.entity.member.Symptom;
 
 import java.util.List;
 
@@ -33,7 +34,7 @@ public class SignUpRequest {
     private List<Disease> diseases;
 
     @NotNull(message = "증상은 필수입니다.")
-    private List<String> symptoms;
+    private List<Symptom> symptoms;
 
     @NotNull(message = "권한은 필수입니다.")
     @Size(min = 1, message = "권한은 최소 1개 이상이여야 합니다.")
@@ -61,7 +62,11 @@ public class SignUpRequest {
                         .build()
         ).forEach(member::addDisease);
 
-        member.getSymptoms().addAll(symptoms);
+        symptoms.stream().map(
+                s -> Symptom.builder()
+                        .name(s.getName())
+                        .build()
+        ).forEach(member::addSymptom);
 
         return member;
     }

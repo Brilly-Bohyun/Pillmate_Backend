@@ -3,7 +3,6 @@ package pillmate.backend.entity.member;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
@@ -49,8 +48,9 @@ public class Member implements UserDetails {
     @JsonIgnore
     private List<Disease> diseases = new ArrayList<>();
 
-    @ElementCollection(fetch = FetchType.LAZY)
-    private List<String> symptoms = new ArrayList<>();
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Symptom> symptoms = new ArrayList<>();
 
     @Column(name = "provider_id", nullable = true)
     private Long providerId;
@@ -90,7 +90,13 @@ public class Member implements UserDetails {
         }
     }
 
-    public void updateHealthInfo(List<Disease> diseaseList, List<String> symptomList) {
+    public void addSymptom(Symptom symptom) {
+        if (symptom != null) {
+            symptoms.add(symptom);
+        }
+    }
+
+    public void updateHealthInfo(List<Disease> diseaseList, List<Symptom> symptomList) {
         updateDisease(diseaseList);
         updateSymptoms(symptomList);
     }
@@ -102,7 +108,7 @@ public class Member implements UserDetails {
         }
     }
 
-    private void updateSymptoms(List<String> symptomList) {
+    private void updateSymptoms(List<Symptom> symptomList) {
         if (symptomList != null) {
             symptoms.clear();
             symptoms.addAll(symptomList);
