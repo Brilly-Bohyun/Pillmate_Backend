@@ -65,7 +65,7 @@ public class JwtTokenProvider {
         setRefreshTokenAtCookie(refreshToken);
 
         // 3. 생성한 토큰을 DTO에 담아 반환
-        return JwtTokenResponse.from(accessToken);
+        return JwtTokenResponse.from(accessToken, member);
     }
 
     /**
