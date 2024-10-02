@@ -68,9 +68,16 @@ public class AlarmService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public ResponseEntity<String> updateAvailability(Long alarmId, Boolean available, Long memberId) {
         findByAlarmId(alarmId).updateAvailability(available);
         return ResponseEntity.ok("알람 on/off 설정이 변경되었습니다.");
+    }
+
+    @Transactional
+    public void deleteAlarm(Long memberId, String medicineName) {
+        List<Alarm> alarmList = findByMemberIdAndMedicineName(memberId, medicineName);
+        alarmList.forEach(alarm -> alarmRepository.deleteById(alarm.getId()));
     }
 
     private List<Alarm> getAllDueAlarms() {
@@ -92,5 +99,9 @@ public class AlarmService {
 
     private Alarm findByAlarmId(Long alarmId) {
         return alarmRepository.findById(alarmId).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_ALARM));
+    }
+
+    private List<Alarm> findByMemberIdAndMedicineName(Long memberId, String medicineName) {
+        return alarmRepository.findAllByMemberIdAndMedicineName(memberId, medicineName);
     }
 }

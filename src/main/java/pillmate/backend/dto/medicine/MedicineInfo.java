@@ -9,6 +9,7 @@ import java.util.List;
 @Builder
 @Data
 public class MedicineInfo {
+    private Long id;
     private String picture;
     private String name;
     private String category;

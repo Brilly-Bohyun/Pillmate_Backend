@@ -17,4 +17,5 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
             "ORDER BY CASE WHEN a.time > :currentTime THEN 0 ELSE 1 END, a.time ASC")
     List<Alarm> findUpcomingAlarmsByMemberId(@Param("memberId") Long memberId, @Param("currentTime") LocalTime currentTime);
 
+    List<Alarm> findAllByMemberIdAndMedicineName(Long memberId, String medicineName);
 }

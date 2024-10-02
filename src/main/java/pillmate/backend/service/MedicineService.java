@@ -100,6 +100,7 @@ public class MedicineService {
     public List<MedicineInfo> showAll(Long memberId) {
         return findAllByMemberId(memberId).stream()
                 .map(medicinePerMember -> MedicineInfo.builder()
+                        .id(medicinePerMember.getMedicine().getId())
                         .picture(medicinePerMember.getMedicine().getPhoto())
                         .name(medicinePerMember.getMedicine().getName())
                         .category(medicinePerMember.getMedicine().getCategory())
@@ -120,6 +121,13 @@ public class MedicineService {
                 modifyMedicineInfo.getTimesPerDay(),
                 modifyMedicineInfo.getDay(),
                 modifyMedicineInfo.getTimeSlotList());
+    }
+
+    @Transactional
+    public void delete(Long memberId, Long medicineId) {
+        MedicinePerMember medicinePerMember = findByMemberIdAndMedicineId(memberId, medicineId);
+        medicinePerMemberRepository.deleteById(medicinePerMember.getId());
+        alarmService.deleteAlarm(memberId, medicinePerMember.getMedicine().getName());
     }
 
     private List<MedicinePerMember> findAllByMemberId(Long memberId) {
