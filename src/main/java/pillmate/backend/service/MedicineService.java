@@ -123,8 +123,8 @@ public class MedicineService {
     @Transactional
     public void delete(Long memberId, Long medicineId) {
         MedicinePerMember medicinePerMember = findByMemberIdAndMedicineId(memberId, medicineId);
-        medicinePerMemberRepository.deleteById(medicinePerMember.getId());
         alarmService.deleteAlarm(memberId, medicinePerMember.getMedicine().getName());
+        medicinePerMemberRepository.deleteById(medicinePerMember.getId());
     }
 
     private List<MedicinePerMember> findAllByMemberId(Long memberId) {
