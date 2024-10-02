@@ -34,4 +34,10 @@ public class Medicine {
         this.category = category;
         this.photo = photo;
     }
+
+    public void updateName(String name) {
+        if (name != null) {
+            this.name = name;
+        }
+    }
 }

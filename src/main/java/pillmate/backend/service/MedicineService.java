@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pillmate.backend.common.exception.BadRequestException;
 import pillmate.backend.common.exception.NotFoundException;
 import pillmate.backend.common.exception.errorcode.ErrorCode;
 import pillmate.backend.dto.alarm.AlarmRequest;
@@ -115,12 +116,17 @@ public class MedicineService {
 
     @Transactional
     public void modify(Long memberId, ModifyMedicineInfo modifyMedicineInfo) {
-        Medicine medicine = findByName(modifyMedicineInfo.getMedicineName());
-        MedicinePerMember medicinePerMember = findByMemberIdAndMedicineId(memberId, medicine.getId());
-        medicinePerMember.update(modifyMedicineInfo.getAmount(),
-                modifyMedicineInfo.getTimesPerDay(),
-                modifyMedicineInfo.getDay(),
-                modifyMedicineInfo.getTimeSlotList());
+        Medicine medicine = findByName(modifyMedicineInfo.getOldMedicineName());
+        if ("white".equals(medicine.getPhoto())) {
+            MedicinePerMember medicinePerMember = findByMemberIdAndMedicineId(memberId, medicine.getId());
+            medicinePerMember.update(modifyMedicineInfo.getAmount(),
+                    modifyMedicineInfo.getTimesPerDay(),
+                    modifyMedicineInfo.getDay(),
+                    modifyMedicineInfo.getTimeSlotList());
+            medicinePerMember.getMedicine().updateName(modifyMedicineInfo.getNewMedicineName());
+        } else {
+            throw new BadRequestException(ErrorCode.INVALID_MEDICINE);
+        }
     }
 
     @Transactional

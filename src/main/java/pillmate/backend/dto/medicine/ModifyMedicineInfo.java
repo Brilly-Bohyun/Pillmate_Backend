@@ -9,7 +9,8 @@ import java.util.List;
 @Builder
 @Data
 public class ModifyMedicineInfo {
-    private String medicineName;
+    private String oldMedicineName;
+    private String newMedicineName;
     private Integer amount;
     private Integer timesPerDay;
     private Integer day;
