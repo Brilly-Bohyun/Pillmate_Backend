@@ -13,6 +13,7 @@ import pillmate.backend.dto.main.WorstRecord;
 import pillmate.backend.entity.Alarm;
 import pillmate.backend.entity.MedicinePerMember;
 import pillmate.backend.entity.MedicineRecord;
+import pillmate.backend.entity.TimeSlot;
 import pillmate.backend.repository.AlarmRepository;
 import pillmate.backend.repository.MedicinePerMemberRepository;
 import pillmate.backend.repository.MedicineRecordRepository;
@@ -100,12 +101,20 @@ public class MainService {
     private List<MedicineAlarmRecord> getMedicineRecords(Long memberId) {
         List<Alarm> alarmList = alarmRepository.findAllByMemberId(memberId);
         return alarmList.stream()
-                .map(alarm -> MedicineAlarmRecord.builder()
-                        .name(alarm.getMedicine().getName())
-                        .category(validateCategory(alarm.getMedicine().getCategory()))
-                        .time(alarm.getTime())
-                        .isEaten(alarm.getIsEaten())
-                        .build())
+                .map(alarm -> {
+                    // alarm에 해당하는 TimeSlot을 모두 가져옴
+                    List<TimeSlot> timeSlots = alarm.getMedicinePerMember().getTimeSlots();
+                    // timeSlots를 pickerTime 기준으로 정렬 (오전~오후 순)
+                    timeSlots.sort(Comparator.comparing(TimeSlot::getPickerTime));
+
+                    // MedicineAlarmRecord 생성
+                    return MedicineAlarmRecord.builder()
+                            .name(alarm.getMedicinePerMember().getMedicine().getName())
+                            .category(validateCategory(alarm.getMedicinePerMember().getMedicine().getCategory()))
+                            .time(timeSlots.get(0).getPickerTime()) // 정렬된 첫 번째 시간 슬롯 사용
+                            .isEaten(alarm.getIsEaten())
+                            .build();
+                })
                 .collect(Collectors.toList());
     }
 
