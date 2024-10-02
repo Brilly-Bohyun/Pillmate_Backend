@@ -9,16 +9,10 @@ import pillmate.backend.common.exception.NotFoundException;
 import pillmate.backend.common.exception.errorcode.ErrorCode;
 import pillmate.backend.dto.alarm.AlarmInfo;
 import pillmate.backend.entity.Alarm;
-import pillmate.backend.entity.Medicine;
 import pillmate.backend.entity.MedicinePerMember;
-import pillmate.backend.entity.TimeSlot;
-import pillmate.backend.entity.member.Member;
 import pillmate.backend.repository.AlarmRepository;
 import pillmate.backend.repository.MedicinePerMemberRepository;
-import pillmate.backend.repository.MedicineRepository;
-import pillmate.backend.repository.MemberRepository;
 
-import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,9 +22,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AlarmService {
     private final AlarmRepository alarmRepository;
-    private final MemberRepository memberRepository;
     private final MedicinePerMemberRepository medicinePerMemberRepository;
-    private final MedicineRepository medicineRepository;
 
     public List<AlarmInfo> showAll(Long memberId) {
         List<Alarm> alarms = alarmRepository.findAllByMemberId(memberId);
