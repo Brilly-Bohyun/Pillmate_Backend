@@ -58,6 +58,11 @@ public class AlarmService {
         alarmList.forEach(alarm -> alarmRepository.deleteById(alarm.getId()));
     }
 
+    @Transactional
+    public void resetAllIsEaten() {
+        alarmRepository.updateAllIsEatenToFalse();
+    }
+
     private MedicinePerMember findByMemberIdAndMedicineId(Long memberId, Long medicineId) {
         return medicinePerMemberRepository.findByMemberIdAndMedicineId(memberId, medicineId);
     }

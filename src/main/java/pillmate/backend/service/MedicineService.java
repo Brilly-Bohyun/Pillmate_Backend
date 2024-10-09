@@ -42,6 +42,7 @@ public class MedicineService {
     private final MedicineRecordRepository medicineRecordRepository;
     private final MedicinePerMemberRepository medicinePerMemberRepository;
 
+    @Transactional
     public UpcomingAlarm getUpcomingAlarm(Long memberId, LocalTime currentTime, Long medicineId) {
         Alarm alarm = alarmRepository.findNextUpcomingAlarmByMember(memberId, LocalTime.now()).orElse(null);
         if (alarm == null) {

@@ -1,6 +1,7 @@
 package pillmate.backend.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import pillmate.backend.entity.Alarm;
@@ -44,4 +45,8 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
             "WHERE mp.medicine.id = :medicineId " +
             "AND ts.pickerTime = :time")
     Optional<Alarm> findByMedicineIdAndTime(@Param("medicineId") Long medicineId, @Param("time") LocalTime time);
+
+    @Modifying
+    @Query("UPDATE Alarm a SET a.isEaten = false")
+    void updateAllIsEatenToFalse();
 }
