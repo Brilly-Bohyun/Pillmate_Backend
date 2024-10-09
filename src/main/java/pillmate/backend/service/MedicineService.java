@@ -17,6 +17,7 @@ import pillmate.backend.entity.Alarm;
 import pillmate.backend.entity.Medicine;
 import pillmate.backend.entity.MedicinePerMember;
 import pillmate.backend.entity.MedicineRecord;
+import pillmate.backend.entity.TimeSlot;
 import pillmate.backend.entity.member.Member;
 import pillmate.backend.repository.AlarmRepository;
 import pillmate.backend.repository.MedicinePerMemberRepository;
@@ -102,7 +103,22 @@ public class MedicineService {
         MedicinePerMember newMedicinePerMember = addRequest.toEntity(member, newMedicine);
         saveMedicinePerMember(newMedicinePerMember);
 
-        alarmRepository.save(Alarm.builder().medicinePerMember(newMedicinePerMember).build());
+        // TimeSlot 리스트에서 새로운 알람에 사용할 TimeSlot 선택
+        for (TimeSlot existingTimeSlot : newMedicinePerMember.getTimeSlots()) {
+            // 새로운 TimeSlot 복사본 생성
+            TimeSlot newTimeSlot = TimeSlot.builder()
+                    .spinnerTime(existingTimeSlot.getSpinnerTime())
+                    .pickerTime(existingTimeSlot.getPickerTime())
+                    .build();
+
+            // 새로운 알람 생성 및 저장
+            Alarm newAlarm = Alarm.builder()
+                    .medicinePerMember(newMedicinePerMember)
+                    .timeSlot(newTimeSlot)
+                    .build();
+
+            alarmRepository.save(newAlarm);
+        }
     }
 
     private void saveMedicinePerMember(MedicinePerMember addRequest) {

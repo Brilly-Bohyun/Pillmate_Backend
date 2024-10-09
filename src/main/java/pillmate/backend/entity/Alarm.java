@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,6 +30,10 @@ public class Alarm {
     @ManyToOne(fetch = FetchType.LAZY)
     private MedicinePerMember medicinePerMember;
 
+    @OneToOne
+    @JoinColumn(name = "timeSlot_id")
+    private TimeSlot timeSlot;
+
     @Builder.Default
     @Column(name = "isEaten", nullable = false)
     private Boolean isEaten = FALSE;
@@ -38,9 +43,10 @@ public class Alarm {
     private Boolean isAvailable = TRUE;
 
     @Builder
-    public Alarm(Long id, MedicinePerMember medicinePerMember, Boolean isEaten, Boolean isAvailable) {
+    public Alarm(Long id, MedicinePerMember medicinePerMember, TimeSlot timeSlot, Boolean isEaten, Boolean isAvailable) {
         this.id = id;
         this.medicinePerMember = medicinePerMember;
+        this.timeSlot = timeSlot;
         this.isEaten = isEaten;
         this.isAvailable = isAvailable;
     }

@@ -22,6 +22,7 @@ import java.time.LocalTime;
 public class TimeSlot {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "timeSlot_id")
     private Long id;
 
     // 투여시간대

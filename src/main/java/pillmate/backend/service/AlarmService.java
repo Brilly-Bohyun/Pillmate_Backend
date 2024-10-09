@@ -40,7 +40,7 @@ public class AlarmService {
                                     .amount(medicineHistory.getAmount())
                                     .timesPerDay(medicineHistory.getTimes())
                                     .day(medicineHistory.getDay())
-                                    .timeSlot(timeSlot) // 여러 timeSlot 중 하나씩 AlarmInfo에 추가
+                                    .timeSlot(alarm.getTimeSlot()) // 여러 timeSlot 중 하나씩 AlarmInfo에 추가
                                     .isAvailable(alarm.getIsAvailable())
                                     .build());
                 })
