@@ -16,6 +16,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -23,6 +24,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,6 +45,10 @@ public class Member implements UserDetails {
 
     @Column(name = "password", nullable = true)
     private String password;
+
+    @Column(name = "created", nullable = true)
+    @CreatedDate
+    private Date created;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
@@ -67,11 +73,12 @@ public class Member implements UserDetails {
     private Boolean usable;
 
     @Builder
-    public Member(Long id, String email, String name, String password, MemberType type, Long providerId, Boolean usable) {
+    public Member(Long id, String email, String name, String password, Date created, MemberType type, Long providerId, Boolean usable) {
         this.id = id;
         this.email = email;
         this.name = name;
         this.password = password;
+        this.created = created;
         this.type = type;
         this.providerId = providerId;
         this.usable = usable;
