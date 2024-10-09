@@ -82,16 +82,27 @@ public class MedicineService {
     @Transactional
     public void add(Long memberId, AddRequest addRequest) {
         Optional<Medicine> foundmedicine = medicineRepository.findByName(addRequest.getMedicineName());
-        Medicine newMedicine;
-        newMedicine = foundmedicine.orElseGet(() -> medicineRepository.save(Medicine.builder()
+        Medicine newMedicine = foundmedicine.orElseGet(() -> medicineRepository.save(Medicine.builder()
                 .name(addRequest.getMedicineName())
                 .category(addRequest.getDisease())
                 .photo("white")
                 .build()));
 
-        MedicinePerMember medicinePerMember = addRequest.toEntity(findByMemberId(memberId), newMedicine);
-        saveMedicinePerMember(medicinePerMember);
-        alarmRepository.save(Alarm.builder().medicinePerMember(medicinePerMember).build());
+        // Step 2: MedicinePerMember 중복 확인 및 저장
+        Member member = findByMemberId(memberId);
+        Optional<MedicinePerMember> foundMedicinePerMember = medicinePerMemberRepository
+                .findByMemberIdAndMedicineId(memberId, newMedicine.getId());
+
+        // 중복된 MedicinePerMember가 있으면 예외 던지기
+        if (foundMedicinePerMember.isPresent()) {
+            throw new BadRequestException(ErrorCode.INVALID_SAME_MEDICINE); // 이미 존재하므로 추가 작업 수행하지 않음
+        }
+
+        // 중복이 없으면 새로운 MedicinePerMember 및 Alarm 저장
+        MedicinePerMember newMedicinePerMember = addRequest.toEntity(member, newMedicine);
+        saveMedicinePerMember(newMedicinePerMember);
+
+        alarmRepository.save(Alarm.builder().medicinePerMember(newMedicinePerMember).build());
     }
 
     private void saveMedicinePerMember(MedicinePerMember addRequest) {
@@ -141,7 +152,7 @@ public class MedicineService {
     }
 
     private MedicinePerMember findByMemberIdAndMedicineId(Long memberId, Long medicineId) {
-        return medicinePerMemberRepository.findByMemberIdAndMedicineId(memberId, medicineId);
+        return medicinePerMemberRepository.findByMemberIdAndMedicineId(memberId, medicineId).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_MEDICINE_MEMBER));
     }
 
     private Member findByMemberId(Long memberId) {

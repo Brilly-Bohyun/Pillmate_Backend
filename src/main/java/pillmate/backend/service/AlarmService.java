@@ -64,7 +64,7 @@ public class AlarmService {
     }
 
     private MedicinePerMember findByMemberIdAndMedicineId(Long memberId, Long medicineId) {
-        return medicinePerMemberRepository.findByMemberIdAndMedicineId(memberId, medicineId);
+        return medicinePerMemberRepository.findByMemberIdAndMedicineId(memberId, medicineId).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_MEDICINE_MEMBER));
     }
 
     private Alarm findByAlarmId(Long alarmId) {
