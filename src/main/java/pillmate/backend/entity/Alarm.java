@@ -13,8 +13,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalTime;
-
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
@@ -50,6 +48,12 @@ public class Alarm {
     public void updateAvailability(Boolean isAvailable) {
         if (isAvailable != null) {
             this.isAvailable = isAvailable;
+        }
+    }
+
+    public void updateIsEaten(Boolean isEaten) {
+        if (isEaten != null) {
+            this.isEaten = isEaten;
         }
     }
 }

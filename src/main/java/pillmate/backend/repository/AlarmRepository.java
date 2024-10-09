@@ -37,4 +37,11 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
             "AND med.name = :medicineName")
     List<Alarm> findAllByMemberIdAndMedicineName(@Param("memberId") Long memberId,
                                                  @Param("medicineName") String medicineName);
+
+    @Query("SELECT a FROM Alarm a " +
+            "JOIN a.medicinePerMember mp " +
+            "JOIN mp.timeSlots ts " +
+            "WHERE mp.medicine.id = :medicineId " +
+            "AND ts.pickerTime = :time")
+    Optional<Alarm> findByMedicineIdAndTime(@Param("medicineId") Long medicineId, @Param("time") LocalTime time);
 }

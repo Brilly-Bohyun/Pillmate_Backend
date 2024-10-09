@@ -20,6 +20,7 @@ import pillmate.backend.dto.medicine.PrescriptionRequest;
 import pillmate.backend.dto.medicine.UpcomingAlarm;
 import pillmate.backend.service.MedicineService;
 
+import java.time.LocalTime;
 import java.util.List;
 
 @Slf4j
@@ -30,8 +31,8 @@ public class MedicineController {
     private final MedicineService medicineService;
 
     @GetMapping
-    public UpcomingAlarm getUpcomingAlarm(@LoggedInMember Long memberId) {
-        return medicineService.getUpcomingAlarm(memberId);
+    public UpcomingAlarm getUpcomingAlarm(@LoggedInMember Long memberId, @RequestParam("time") LocalTime currentTime, @RequestParam("medicineId") Long medicineId) {
+        return medicineService.getUpcomingAlarm(memberId, currentTime, medicineId);
     }
 
     @PostMapping("/name")

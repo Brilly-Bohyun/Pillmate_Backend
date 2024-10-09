@@ -110,8 +110,8 @@ public class MainService {
 
                     // MedicineAlarmRecord 생성
                     return MedicineAlarmRecord.builder()
+                            .MedicineId(alarm.getMedicinePerMember().getMedicine().getId())
                             .name(alarm.getMedicinePerMember().getMedicine().getName())
-                            .category(validateCategory(alarm.getMedicinePerMember().getMedicine().getCategory()))
                             .time(timeSlots.get(0).getPickerTime()) // 정렬된 첫 번째 시간 슬롯 사용
                             .isEaten(alarm.getIsEaten())
                             .build();
