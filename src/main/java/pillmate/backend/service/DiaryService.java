@@ -46,7 +46,11 @@ public class DiaryService {
 
     public Today show(Long memberId, LocalDate date) {
         Diary diary = diaryRepository.findByMemberIdAndAndDate(memberId, date);
-        return Today.builder().symptoms(diary.getSymptom()).record(diary.getRecord()).build();
+        return Today.builder().symptoms(diary.getSymptom())
+                              .record(diary.getRecord())
+                              .score(diary.getScore())
+                              .comment(findByScore(diary.getScore()))
+                              .build();
     }
 
     public List<MonthlyScore> showMonthlyScore(Long memberId) {
@@ -70,5 +74,31 @@ public class DiaryService {
 
     private Member findByMemberId(Long memberId) {
         return memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(NOT_FOUND_MEMBER));
+    }
+
+    private String findByScore(Integer score) {
+        if (score == 1) {
+            return "통증이 미미하거나 없어요";
+        } else if (score == 2) {
+            return "약간의 통증이 있지만 문제는 없어요";
+        } else if (score == 3) {
+            return "통증이 상당한 편이에요";
+        } else if (score == 4) {
+            return "통증이 일상생활을 방해해요";
+        } else if (score == 5) {
+            return "통증때문에 일상생활이 어려워요";
+        } else if (score == 6) {
+            return "통증 때문에 다른 일을 할 수 없어요";
+        } else if (score == 7) {
+            return "통증이 상당한 편이에요";
+        } else if (score == 8) {
+            return "통증이 상당해서 참기가 어려워요";
+        } else if (score == 9) {
+            return "거의 최대의 통증이에요";
+        } else if (score == 10) {
+            return "표현할 수 없는 최대의 통증이에요";
+        } else {
+            return "점수가 잘 못 되었습니다.";
+        }
     }
 }

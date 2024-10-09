@@ -9,5 +9,7 @@ import java.util.List;
 @Data
 public class Today {
     private List<String> symptoms;
+    private Integer score;
+    private String comment;
     private String record;
 }
