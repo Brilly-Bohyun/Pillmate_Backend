@@ -13,6 +13,7 @@ import pillmate.backend.entity.MedicinePerMember;
 import pillmate.backend.repository.AlarmRepository;
 import pillmate.backend.repository.MedicinePerMemberRepository;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,6 +44,7 @@ public class AlarmService {
                                     .isAvailable(alarm.getIsAvailable())
                                     .build());
                 })
+                .sorted(Comparator.comparing(alarmInfo -> alarmInfo.getTimeSlot().getPickerTime())) // pickerTime을 기준으로 정렬
                 .collect(Collectors.toList());
     }
 
