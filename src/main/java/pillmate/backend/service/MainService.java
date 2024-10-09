@@ -22,6 +22,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.temporal.TemporalAdjusters;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -129,28 +130,32 @@ public class MainService {
     public List<AdherenceRate> getAllMedicineAdherenceRates(Long memberId) {
         List<MedicinePerMember> medicinePerMembers = medicinePerMemberRepository.findAllByMemberId(memberId);
 
-        return medicinePerMembers.stream()
-                .map(mpm -> {
-                    Integer totalAmount = getTotalAmount(mpm);
-                    Integer takenAmount = getTakenAmount(memberId, mpm.getMedicine().getId());
-                    return AdherenceRate.builder()
-                            .medicineName(mpm.getMedicine().getName())
-                            .taken(takenAmount)
-                            .scheduled(totalAmount)
-                            .rate((double) takenAmount / totalAmount)
-                            .build();
-                })
-                .sorted(Comparator.comparingDouble(AdherenceRate::getRate).reversed())
-                .collect(Collectors.toList());
+        if (!medicinePerMembers.isEmpty()) {
+            return medicinePerMembers.stream()
+                    .map(mpm -> {
+                        Integer totalAmount = getTotalAmount(mpm);
+                        Integer takenAmount = getTakenAmount(memberId, mpm.getMedicine().getId());
+                        return AdherenceRate.builder()
+                                .medicineName(mpm.getMedicine().getName())
+                                .taken(takenAmount)
+                                .scheduled(totalAmount)
+                                .rate((double) takenAmount / totalAmount)
+                                .build();
+                    })
+                    .sorted(Comparator.comparingDouble(AdherenceRate::getRate).reversed())
+                    .collect(Collectors.toList());
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     public BestRecord getBestRecord(Long memberId) {
-        return BestRecord.from(getAllMedicineAdherenceRates(memberId).stream().findFirst().orElse(null));
+        return BestRecord.from(getAllMedicineAdherenceRates(memberId).stream().findFirst().orElse(AdherenceRate.empty()));
     }
 
     public WorstRecord getWorstRecord(Long memberId) {
         List<AdherenceRate> rates = getAllMedicineAdherenceRates(memberId);
-        return WorstRecord.from(rates.isEmpty() ? null : rates.get(rates.size() - 1));
+        return WorstRecord.from(rates.isEmpty() ? AdherenceRate.empty() : rates.get(rates.size() - 1));
     }
 
     private String validateGrade(Integer rate) {

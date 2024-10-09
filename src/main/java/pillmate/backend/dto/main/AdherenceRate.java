@@ -1,9 +1,12 @@
 package pillmate.backend.dto.main;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class AdherenceRate {
     private String medicineName;
     private Integer taken;
@@ -16,5 +19,9 @@ public class AdherenceRate {
         this.taken = taken;
         this.scheduled = scheduled;
         this.rate = rate;
+    }
+
+    public static AdherenceRate empty(){
+        return new AdherenceRate();
     }
 }
