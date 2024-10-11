@@ -27,8 +27,8 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
             "AND a.isAvailable = TRUE " +
             "AND a.isEaten = FALSE " +
             "ORDER BY ts.pickerTime ASC")
-    Optional<Alarm> findNextUpcomingAlarmByMember(@Param("memberId") Long memberId,
-                                                  @Param("currentTime") LocalTime currentTime);
+    List<Alarm> findNextUpcomingAlarmsByMember(@Param("memberId") Long memberId,
+                                               @Param("currentTime") LocalTime currentTime);
 
     @Query("SELECT a FROM Alarm a " +
             "JOIN a.medicinePerMember mpm " +

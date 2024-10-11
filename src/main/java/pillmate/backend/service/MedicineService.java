@@ -45,10 +45,12 @@ public class MedicineService {
 
     @Transactional
     public UpcomingAlarm getUpcomingAlarm(Long memberId, LocalTime currentTime, Long medicineId) {
-        Alarm alarm = alarmRepository.findNextUpcomingAlarmByMember(memberId, LocalTime.now()).orElse(null);
-        if (alarm == null) {
+        List<Alarm> alarms = alarmRepository.findNextUpcomingAlarmsByMember(memberId, LocalTime.now());
+        if (alarms.isEmpty()) {
             throw new NotFoundException(ErrorCode.NOT_FOUND_ALARM);
         }
+
+        Alarm alarm = alarms.get(0);  // 가장 가까운 알람을 선택
 
         Alarm currentAlarm = findByMedicineAndTime(medicineId, currentTime);
         currentAlarm.updateIsEaten(true);
@@ -59,7 +61,7 @@ public class MedicineService {
                 .build());
 
         return UpcomingAlarm.builder().medicineName(alarm.getMedicinePerMember().getMedicine().getName())
-                                        .time(alarm.getMedicinePerMember().getTimeSlots().get(0).getPickerTime()).build();
+                .time(alarm.getMedicinePerMember().getTimeSlots().get(0).getPickerTime()).build();
     }
 
     public List<MedicineBasicInfo> getMedicineInfo(Long memberId, List<PrescriptionRequest> nameList) {
@@ -105,16 +107,10 @@ public class MedicineService {
 
         // TimeSlot 리스트에서 새로운 알람에 사용할 TimeSlot 선택
         for (TimeSlot existingTimeSlot : newMedicinePerMember.getTimeSlots()) {
-            // 새로운 TimeSlot 복사본 생성
-            TimeSlot newTimeSlot = TimeSlot.builder()
-                    .spinnerTime(existingTimeSlot.getSpinnerTime())
-                    .pickerTime(existingTimeSlot.getPickerTime())
-                    .build();
-
             // 새로운 알람 생성 및 저장
             Alarm newAlarm = Alarm.builder()
                     .medicinePerMember(newMedicinePerMember)
-                    .timeSlot(newTimeSlot)
+                    .timeSlot(existingTimeSlot)
                     .build();
 
             alarmRepository.save(newAlarm);

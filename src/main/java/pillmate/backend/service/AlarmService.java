@@ -10,6 +10,7 @@ import pillmate.backend.common.exception.errorcode.ErrorCode;
 import pillmate.backend.dto.alarm.AlarmInfo;
 import pillmate.backend.entity.Alarm;
 import pillmate.backend.entity.MedicinePerMember;
+import pillmate.backend.entity.TimeSlot;
 import pillmate.backend.repository.AlarmRepository;
 import pillmate.backend.repository.MedicinePerMemberRepository;
 
@@ -28,22 +29,16 @@ public class AlarmService {
     public List<AlarmInfo> showAll(Long memberId) {
         List<Alarm> alarms = alarmRepository.findAllByMemberId(memberId);
         return alarms.stream()
-                .flatMap(alarm -> {
-                    MedicinePerMember medicineHistory = findByMemberIdAndMedicineId(memberId, alarm.getMedicinePerMember().getMedicine().getId());
-
-                    // MedicineHistory에서 모든 timeSlots를 AlarmInfo로 변환
-                    return medicineHistory.getTimeSlots().stream()
-                            .map(timeSlot -> AlarmInfo.builder()
-                                    .id(alarm.getId())
-                                    .name(alarm.getMedicinePerMember().getMedicine().getName())
-                                    .category(alarm.getMedicinePerMember().getMedicine().getCategory())
-                                    .amount(medicineHistory.getAmount())
-                                    .timesPerDay(medicineHistory.getTimes())
-                                    .day(medicineHistory.getDay())
-                                    .timeSlot(alarm.getTimeSlot()) // 여러 timeSlot 중 하나씩 AlarmInfo에 추가
-                                    .isAvailable(alarm.getIsAvailable())
-                                    .build());
-                })
+                .map(alarm -> AlarmInfo.builder()
+                        .id(alarm.getId())
+                        .name(alarm.getMedicinePerMember().getMedicine().getName())
+                        .category(alarm.getMedicinePerMember().getMedicine().getCategory())
+                        .amount(alarm.getMedicinePerMember().getAmount())
+                        .timesPerDay(alarm.getMedicinePerMember().getTimes())
+                        .day(alarm.getMedicinePerMember().getDay())
+                        .timeSlot(alarm.getTimeSlot())
+                        .isAvailable(alarm.getIsAvailable())
+                        .build())
                 .sorted(Comparator.comparing(alarmInfo -> alarmInfo.getTimeSlot().getPickerTime())) // pickerTime을 기준으로 정렬
                 .collect(Collectors.toList());
     }
