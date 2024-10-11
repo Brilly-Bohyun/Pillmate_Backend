@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pillmate.backend.common.exception.BadRequestException;
 import pillmate.backend.common.exception.NotFoundException;
 import pillmate.backend.common.util.JwtTokenProvider;
+import pillmate.backend.dto.member.CheckEmailRequest;
 import pillmate.backend.dto.member.CheckPasswordRequest;
 import pillmate.backend.dto.member.FindPasswordRequest;
 import pillmate.backend.dto.member.FindPasswordResponse;
@@ -30,6 +31,7 @@ import java.util.UUID;
 
 import static pillmate.backend.common.exception.errorcode.ErrorCode.ALREADY_EXIST_USER;
 import static pillmate.backend.common.exception.errorcode.ErrorCode.EXPIRED_TOKEN_VALID_TIME;
+import static pillmate.backend.common.exception.errorcode.ErrorCode.INVALID_EMAIL;
 import static pillmate.backend.common.exception.errorcode.ErrorCode.MISMATCH_EMAIL;
 import static pillmate.backend.common.exception.errorcode.ErrorCode.MISMATCH_PASSWORD;
 import static pillmate.backend.common.exception.errorcode.ErrorCode.MISMATCH_TOKEN;
@@ -134,6 +136,10 @@ public class MemberService {
     public Boolean checkPassword(Long memberId, CheckPasswordRequest checkPasswordRequest) {
         Member member = findMemberById(memberId);
         return passwordEncoder.matches(checkPasswordRequest.getPassword(), member.getPassword());
+    }
+
+    public Boolean checkEmail(Long memberId, CheckEmailRequest checkEmailRequest) {
+        return memberRepository.findByEmail(checkEmailRequest.getEmail()).isPresent();
     }
 
     @Transactional

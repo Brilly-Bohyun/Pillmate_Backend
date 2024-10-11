@@ -39,7 +39,8 @@ public enum ErrorCode {
     NOT_FOUND_ALARM("활성화된 알람이 없습니다."),
     INVALID_MEDICINE("해당 약은 수정이 불가능합니다."),
     NOT_FOUND_MEDICINE_MEMBER("사용자의 약을 찾을 수 없습니다."),
-    INVALID_SAME_MEDICINE("이미 존재하는 약이 있습니다.");
+    INVALID_SAME_MEDICINE("이미 존재하는 약이 있습니다."),
+    INVALID_EMAIL("이미 존재하는 이메일이 있습니다.");
 
     private final String message;
     ErrorCode(String message) {

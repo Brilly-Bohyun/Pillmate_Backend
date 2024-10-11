@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pillmate.backend.common.util.LoggedInMember;
+import pillmate.backend.dto.member.CheckEmailRequest;
 import pillmate.backend.dto.member.CheckPasswordRequest;
 import pillmate.backend.dto.member.FindPasswordRequest;
 import pillmate.backend.dto.member.FindPasswordResponse;
@@ -53,6 +55,16 @@ public class MemberController {
     @PostMapping("/reissue")
     public LoginResponse reissue(@LoggedInMember Long memberId, @CookieValue(REFRESH_TOKEN) String refreshToken) {
         return memberService.reissueToken(memberId, refreshToken);
+    }
+
+    @PostMapping("/check/email")
+    public ResponseEntity<String> checkEmail(@LoggedInMember Long memberId, @RequestBody CheckEmailRequest checkEmailRequest) {
+        Boolean isDuplicate = memberService.checkEmail(memberId, checkEmailRequest);
+        if (isDuplicate) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("중복되는 이메일 입니다");
+        } else {
+            return ResponseEntity.ok("가능한 이메일입니다.");
+        }
     }
 
     @PostMapping("/check/password")
