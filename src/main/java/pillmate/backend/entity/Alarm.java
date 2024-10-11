@@ -1,5 +1,6 @@
 package pillmate.backend.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -30,7 +31,7 @@ public class Alarm {
     @ManyToOne(fetch = FetchType.LAZY)
     private MedicinePerMember medicinePerMember;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "timeSlot_id")
     private TimeSlot timeSlot;
 
