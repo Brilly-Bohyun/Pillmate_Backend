@@ -113,6 +113,7 @@ public class MainService {
                             .MedicineId(alarm.getMedicinePerMember().getMedicine().getId())
                             .name(alarm.getMedicinePerMember().getMedicine().getName())
                             .time(timeSlots.get(0).getPickerTime()) // 정렬된 첫 번째 시간 슬롯 사용
+                            .category(alarm.getMedicinePerMember().getMedicine().getCategory())
                             .isEaten(alarm.getIsEaten())
                             .build();
                 })
