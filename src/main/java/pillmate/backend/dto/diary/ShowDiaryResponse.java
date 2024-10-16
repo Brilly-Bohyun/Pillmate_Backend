@@ -8,6 +8,6 @@ import java.util.List;
 @Builder
 @Data
 public class ShowDiaryResponse {
-    private MonthlyScore monthlyScore;
+    private List<TotalInfo> totalInfo;
     private Today today;
 }

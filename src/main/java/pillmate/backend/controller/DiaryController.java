@@ -14,7 +14,8 @@ import pillmate.backend.common.util.LoggedInMember;
 import pillmate.backend.dto.diary.CreateDiaryRequest;
 import pillmate.backend.dto.diary.CreateDiaryResponse;
 import pillmate.backend.dto.diary.EditDiaryRequest;
-import pillmate.backend.dto.diary.MonthlyScore;
+import pillmate.backend.dto.diary.ShowDiaryResponse;
+import pillmate.backend.dto.diary.TotalInfo;
 import pillmate.backend.dto.diary.Today;
 import pillmate.backend.service.DiaryService;
 
@@ -45,7 +46,7 @@ public class DiaryController {
     }
 
     @GetMapping
-    public List<MonthlyScore> showMonthlyScore(@LoggedInMember Long memberId) {
-        return diaryService.showMonthlyScore(memberId);
+    public ShowDiaryResponse showMonthly(@LoggedInMember Long memberId) {
+        return diaryService.showMonthly(memberId);
     }
 }

@@ -7,7 +7,8 @@ import java.time.LocalDate;
 
 @Builder
 @Data
-public class MonthlyScore {
-    private LocalDate date;
-    private Integer score;
+public class TotalInfo {
+    private String name;
+    private LocalDate startDate;
+    private LocalDate endDate;
 }

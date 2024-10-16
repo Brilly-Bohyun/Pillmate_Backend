@@ -5,22 +5,24 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pillmate.backend.common.exception.NotFoundException;
-import pillmate.backend.common.exception.errorcode.ErrorCode;
+import pillmate.backend.dto.alarm.SimpleAlarmInfo;
 import pillmate.backend.dto.diary.CreateDiaryRequest;
 import pillmate.backend.dto.diary.CreateDiaryResponse;
 import pillmate.backend.dto.diary.EditDiaryRequest;
-import pillmate.backend.dto.diary.MonthlyScore;
 import pillmate.backend.dto.diary.ShowDiaryResponse;
+import pillmate.backend.dto.diary.TotalInfo;
 import pillmate.backend.dto.diary.Today;
+import pillmate.backend.entity.Alarm;
 import pillmate.backend.entity.Diary;
+import pillmate.backend.entity.MedicinePerMember;
 import pillmate.backend.entity.member.Member;
+import pillmate.backend.repository.AlarmRepository;
 import pillmate.backend.repository.DiaryRepository;
+import pillmate.backend.repository.MedicinePerMemberRepository;
 import pillmate.backend.repository.MemberRepository;
 
 import java.time.LocalDate;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static pillmate.backend.common.exception.errorcode.ErrorCode.*;
 
@@ -29,7 +31,9 @@ import static pillmate.backend.common.exception.errorcode.ErrorCode.*;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class DiaryService {
+    private final AlarmRepository alarmRepository;
     private final DiaryRepository diaryRepository;
+    private final MedicinePerMemberRepository medicinePerMemberRepository;
     private final MemberRepository memberRepository;
 
     @Transactional
@@ -45,27 +49,35 @@ public class DiaryService {
     }
 
     public Today show(Long memberId, LocalDate date) {
+        List<SimpleAlarmInfo> alarms = findAlarmsByMemberId(memberId).stream().map(alarm -> SimpleAlarmInfo.builder()
+                        .name(alarm.getMedicinePerMember().getMedicine().getName())
+                        .time(alarm.getTimeSlot().getPickerTime()).build())
+                        .toList();
         Diary diary = diaryRepository.findByMemberIdAndAndDate(memberId, date);
-        return Today.builder().symptoms(diary.getSymptom())
+        return Today.builder().alarms(alarms)
+                              .symptoms(diary.getSymptom())
                               .record(diary.getRecord())
                               .score(diary.getScore())
                               .comment(findByScore(diary.getScore()))
                               .build();
     }
 
-    public List<MonthlyScore> showMonthlyScore(Long memberId) {
-        LocalDate today = LocalDate.now();
-        LocalDate firstDayOfMonth = today.withDayOfMonth(1);
+    public ShowDiaryResponse showMonthly(Long memberId) {
+        List<MedicinePerMember> medicines = findMedicineByMemberId(memberId);
+        List<TotalInfo> totalInfos = medicines.stream().map(medicinePerMember -> TotalInfo.builder()
+                .name(medicinePerMember.getMedicine().getName())
+                .startDate(medicinePerMember.getCreated())
+                .endDate(medicinePerMember.getCreated().plusDays(medicinePerMember.getDay()))
+                .build()).toList();
+        return ShowDiaryResponse.builder().totalInfo(totalInfos).today(show(memberId, LocalDate.now())).build();
+    }
 
-        List<Diary> diaries = diaryRepository.findDiariesByMemberIdAndDateRange(memberId, firstDayOfMonth, today);
+    private List<Alarm> findAlarmsByMemberId(Long memberId) {
+        return alarmRepository.findAllByMemberId(memberId);
+    }
 
-        return diaries.stream()
-                .map(diary -> MonthlyScore.builder()
-                          .date(diary.getDate())
-                          .score(diary.getScore())
-                          .build())
-                .sorted(Comparator.comparing(MonthlyScore::getDate))
-                .collect(Collectors.toList());
+    private List<MedicinePerMember> findMedicineByMemberId(Long memberId) {
+        return medicinePerMemberRepository.findAllByMemberId(memberId);
     }
 
     private Diary findById(Long diaryId) {

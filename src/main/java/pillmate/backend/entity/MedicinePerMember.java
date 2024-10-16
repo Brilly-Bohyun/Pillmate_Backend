@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,14 +16,18 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import pillmate.backend.entity.member.Member;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 public class MedicinePerMember {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,6 +57,10 @@ public class MedicinePerMember {
     @JsonIgnore
     private List<TimeSlot> timeSlots = new ArrayList<>();
 
+    @Column(name = "created", nullable = true)
+    @CreatedDate
+    private LocalDate created;
+
     public void addTimeSlot(TimeSlot timeSlot) {
         if (timeSlot != null) {
             timeSlots.add(timeSlot);
@@ -59,13 +68,14 @@ public class MedicinePerMember {
     }
 
     @Builder
-    public MedicinePerMember(Long id, Member member, Medicine medicine, Integer amount, Integer times, Integer day) {
+    public MedicinePerMember(Long id, Member member, Medicine medicine, Integer amount, Integer times, Integer day, LocalDate created) {
         this.id = id;
         this.member = member;
         this.medicine = medicine;
         this.amount = amount;
         this.times = times;
         this.day = day;
+        this.created = created;
     }
 
     public void update(final Integer amount, final Integer times, final Integer day, final List<TimeSlot> timeSlots) {
