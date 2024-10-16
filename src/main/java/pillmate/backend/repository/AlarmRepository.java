@@ -20,14 +20,6 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
     @Query("SELECT a FROM Alarm a " +
             "JOIN a.medicinePerMember mpm " +
             "JOIN mpm.member m " +
-            "WHERE m.id = :memberId " +
-            "AND a.isAvailable = TRUE " +
-            "AND a.isEaten = FALSE")
-    List<Alarm> findNextUpcomingAlarmsByMember(@Param("memberId") Long memberId);
-
-    @Query("SELECT a FROM Alarm a " +
-            "JOIN a.medicinePerMember mpm " +
-            "JOIN mpm.member m " +
             "JOIN mpm.medicine med " +
             "WHERE m.id = :memberId " +
             "AND med.name = :medicineName")
