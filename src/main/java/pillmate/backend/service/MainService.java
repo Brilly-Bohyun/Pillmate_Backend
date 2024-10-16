@@ -101,18 +101,17 @@ public class MainService {
 
     private List<MedicineAlarmRecord> getMedicineRecords(Long memberId) {
         List<Alarm> alarmList = alarmRepository.findAllByMemberId(memberId);
+
+        // alarmList를 Alarm의 timeSlot 기준으로 정렬 (오전~오후 순)
+        alarmList.sort(Comparator.comparing(alarm -> alarm.getTimeSlot().getPickerTime()));
+
         return alarmList.stream()
                 .map(alarm -> {
-                    // alarm에 해당하는 TimeSlot을 모두 가져옴
-                    List<TimeSlot> timeSlots = alarm.getMedicinePerMember().getTimeSlots();
-                    // timeSlots를 pickerTime 기준으로 정렬 (오전~오후 순)
-                    timeSlots.sort(Comparator.comparing(TimeSlot::getPickerTime));
-
                     // MedicineAlarmRecord 생성
                     return MedicineAlarmRecord.builder()
                             .MedicineId(alarm.getMedicinePerMember().getMedicine().getId())
                             .name(alarm.getMedicinePerMember().getMedicine().getName())
-                            .time(alarm.getTimeSlot().getPickerTime()) // 정렬된 첫 번째 시간 슬롯 사용
+                            .time(alarm.getTimeSlot().getPickerTime())
                             .category(alarm.getMedicinePerMember().getMedicine().getCategory())
                             .isEaten(alarm.getIsEaten())
                             .build();
