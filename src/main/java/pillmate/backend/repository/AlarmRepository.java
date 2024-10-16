@@ -17,16 +17,15 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
             "WHERE m.id = :memberId")
     List<Alarm> findAllByMemberId(@Param("memberId") Long memberId);
 
-    //List<Alarm> findAllByTime(LocalTime currentTime);
     @Query("SELECT a FROM Alarm a " +
             "JOIN a.medicinePerMember mpm " +
             "JOIN mpm.member m " +
             "JOIN mpm.timeSlots ts " +
             "WHERE m.id = :memberId " +
-            "AND ts.pickerTime > :currentTime " +
+            "AND (ts.pickerTime > :currentTime OR ts.pickerTime <= :currentTime) " +
             "AND a.isAvailable = TRUE " +
             "AND a.isEaten = FALSE " +
-            "ORDER BY ts.pickerTime ASC")
+            "ORDER BY CASE WHEN ts.pickerTime > :currentTime THEN 0 ELSE 1 END, ts.pickerTime ASC")
     List<Alarm> findNextUpcomingAlarmsByMember(@Param("memberId") Long memberId,
                                                @Param("currentTime") LocalTime currentTime);
 

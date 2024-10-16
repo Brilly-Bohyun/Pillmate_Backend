@@ -45,7 +45,7 @@ public class MedicineService {
 
     @Transactional
     public UpcomingAlarm getUpcomingAlarm(Long memberId, LocalTime currentTime, Long medicineId) {
-        List<Alarm> alarms = alarmRepository.findNextUpcomingAlarmsByMember(memberId, LocalTime.now());
+        List<Alarm> alarms = alarmRepository.findNextUpcomingAlarmsByMember(memberId, currentTime);
         if (alarms.isEmpty()) {
             throw new NotFoundException(ErrorCode.NOT_FOUND_ALARM);
         }
@@ -61,7 +61,7 @@ public class MedicineService {
                 .build());
 
         return UpcomingAlarm.builder().medicineName(alarm.getMedicinePerMember().getMedicine().getName())
-                .time(alarm.getMedicinePerMember().getTimeSlots().get(0).getPickerTime()).build();
+                .time(alarm.getTimeSlot().getPickerTime()).build();
     }
 
     public List<MedicineBasicInfo> getMedicineInfo(Long memberId, List<PrescriptionRequest> nameList) {
