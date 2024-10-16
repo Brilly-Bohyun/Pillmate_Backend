@@ -45,17 +45,25 @@ public class MedicineService {
 
     @Transactional
     public UpcomingAlarm getUpcomingAlarm(Long memberId, LocalTime currentTime, Long medicineId) {
-        List<Alarm> alarms = alarmRepository.findNextUpcomingAlarmsByMember(memberId, currentTime);
+        List<Alarm> alarms = alarmRepository.findNextUpcomingAlarmsByMember(memberId);
         if (alarms.isEmpty()) {
             throw new NotFoundException(ErrorCode.NOT_FOUND_ALARM);
         }
 
-        Alarm alarm = alarms.get(0);  // 가장 가까운 알람을 선택
+        // 현재 시간 이후 또는 다음날 첫 번째 알람을 찾기 위한 로직
+        List<Alarm> upcomingAlarms = alarms.stream()
+                .filter(alarm -> {
+                    LocalTime pickerTime = alarm.getTimeSlot().getPickerTime();
+                    return pickerTime.isAfter(currentTime) || pickerTime.isBefore(currentTime);
+                })
+                .sorted(Comparator.comparing(alarm -> alarm.getTimeSlot().getPickerTime()))
+                .toList();
+        Alarm alarm = upcomingAlarms.get(0);
 
         Alarm currentAlarm = findByMedicineAndTime(medicineId, currentTime);
         currentAlarm.updateIsEaten(true);
         medicineRecordRepository.save(MedicineRecord.builder().member(findByMemberId(memberId))
-                .medicine(alarm.getMedicinePerMember().getMedicine())
+                .medicine(currentAlarm.getMedicinePerMember().getMedicine())
                 .time(currentTime)
                 .isEaten(true)
                 .build());
