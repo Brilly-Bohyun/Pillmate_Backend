@@ -45,17 +45,18 @@ public class MedicineService {
 
     @Transactional
     public UpcomingAlarm getUpcomingAlarm(Long memberId, LocalTime currentTime, Long medicineId) {
-        // 현재 시간 이후 또는 다음날 첫 번째 알람을 찾기 위한 로직
-        List<Alarm> upcomingAlarms = alarmRepository.findAllByMemberId(memberId).stream()
-                .filter(alarm -> {
-                    LocalTime pickerTime = alarm.getTimeSlot().getPickerTime();
-                    return pickerTime.isAfter(currentTime) || pickerTime.isBefore(currentTime)
-                            && Boolean.TRUE.equals(alarm.getIsAvailable())
-                            && Boolean.FALSE.equals(alarm.getIsEaten());
-                })
-                .sorted(Comparator.comparing(alarm -> alarm.getTimeSlot().getPickerTime()))
-                .toList();
-        Alarm alarm = upcomingAlarms.get(0);
+        Alarm upcomingAlarm = alarmRepository.findAllByMemberId(memberId).stream()
+                .filter(alarm -> Boolean.TRUE.equals(alarm.getIsAvailable()) && Boolean.FALSE.equals(alarm.getIsEaten()))
+                .filter(alarm -> alarm.getTimeSlot().getPickerTime().isAfter(currentTime)) // 현재 시간 이후의 알람 필터링
+                .sorted(Comparator.comparing(alarm -> alarm.getTimeSlot().getPickerTime())) // pickerTime 기준으로 정렬
+                .findFirst() // 현재 시간 이후의 첫 번째 알람을 찾음
+                .orElseGet(() ->
+                        alarmRepository.findAllByMemberId(memberId).stream() // 현재 시간 이후 알람이 없을 경우
+                                .filter(alarm -> Boolean.TRUE.equals(alarm.getIsAvailable()) && Boolean.FALSE.equals(alarm.getIsEaten()))
+                                .sorted(Comparator.comparing(alarm -> alarm.getTimeSlot().getPickerTime())) // pickerTime 기준으로 정렬
+                                .findFirst() // 다음 날 첫 번째 알람을 찾음
+                                .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_ALARM))
+                );
 
         Alarm currentAlarm = findByMedicineAndTime(medicineId, currentTime);
         currentAlarm.updateIsEaten(true);
@@ -65,8 +66,8 @@ public class MedicineService {
                 .isEaten(true)
                 .build());
 
-        return UpcomingAlarm.builder().medicineName(alarm.getMedicinePerMember().getMedicine().getName())
-                .time(alarm.getTimeSlot().getPickerTime()).build();
+        return UpcomingAlarm.builder().medicineName(upcomingAlarm.getMedicinePerMember().getMedicine().getName())
+                .time(upcomingAlarm.getTimeSlot().getPickerTime()).build();
     }
 
     public List<MedicineBasicInfo> getMedicineInfo(Long memberId, List<PrescriptionRequest> nameList) {
