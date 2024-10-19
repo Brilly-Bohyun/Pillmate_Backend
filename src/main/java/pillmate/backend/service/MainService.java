@@ -13,7 +13,6 @@ import pillmate.backend.dto.main.WorstRecord;
 import pillmate.backend.entity.Alarm;
 import pillmate.backend.entity.MedicinePerMember;
 import pillmate.backend.entity.MedicineRecord;
-import pillmate.backend.entity.TimeSlot;
 import pillmate.backend.repository.AlarmRepository;
 import pillmate.backend.repository.MedicinePerMemberRepository;
 import pillmate.backend.repository.MedicineRecordRepository;
@@ -106,6 +105,7 @@ public class MainService {
         alarmList.sort(Comparator.comparing(alarm -> alarm.getTimeSlot().getPickerTime()));
 
         return alarmList.stream()
+                .filter(alarm -> alarm.getIsAvailable().booleanValue() == Boolean.TRUE)
                 .map(alarm -> {
                     // MedicineAlarmRecord 생성
                     return MedicineAlarmRecord.builder()
