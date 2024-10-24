@@ -19,6 +19,7 @@ import pillmate.backend.repository.MedicineRecordRepository;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Collections;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class MainService {
+    private final AlarmService alarmService;
     private final AlarmRepository alarmRepository;
     private final MedicinePerMemberRepository medicinePerMemberRepository;
     private final MedicineRecordRepository medicineRecordRepository;
@@ -38,10 +40,11 @@ public class MainService {
     private LocalDate START_DATE = LocalDate.now().withDayOfMonth(1);
     private LocalDate END_DATE = LocalDate.now().minusDays(1);
 
-    public MainResponse show(final Long memberId) {
+    public MainResponse show(final Long memberId, LocalTime currentTime) {
         return MainResponse.builder()
                 .weekRateInfoList(getWeeklyIntakeRates(memberId))
                 .medicineAlarmRecords(getMedicineRecords(memberId))
+                .upcomingAlarm(alarmService.getUpcomingAlarm(memberId, currentTime))
                 .grade(validateGrade(getRate(memberId)))
                 .takenDay(getTakenDay(memberId))
                 .month(getMonth())

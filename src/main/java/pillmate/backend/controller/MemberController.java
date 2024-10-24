@@ -13,10 +13,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pillmate.backend.common.util.LoggedInMember;
-import pillmate.backend.dto.medicine.UpcomingAlarm;
 import pillmate.backend.dto.member.CheckEmailRequest;
 import pillmate.backend.dto.member.CheckPasswordRequest;
 import pillmate.backend.dto.member.FindPasswordRequest;
@@ -30,8 +28,6 @@ import pillmate.backend.dto.member.MyHealthInfo;
 import pillmate.backend.dto.member.SignUpRequest;
 import pillmate.backend.service.AlarmService;
 import pillmate.backend.service.MemberService;
-
-import java.time.LocalTime;
 
 @Slf4j
 @RestController
@@ -96,10 +92,5 @@ public class MemberController {
     @PatchMapping("/healthinfo")
     public ResponseEntity<String> updateHealthInfo(@LoggedInMember Long memberId, @RequestBody MyHealthInfo modifyHealthInfo) {
         return memberService.modifyHealthInfo(memberId, modifyHealthInfo);
-    }
-
-    @GetMapping
-    public UpcomingAlarm getUpcomingAlarm(@LoggedInMember Long memberId, @RequestParam("time") LocalTime currentTime) {
-        return alarmService.getUpcomingAlarm(memberId, currentTime);
     }
 }

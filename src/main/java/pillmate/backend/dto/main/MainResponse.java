@@ -2,6 +2,7 @@ package pillmate.backend.dto.main;
 
 import lombok.Builder;
 import lombok.Data;
+import pillmate.backend.dto.medicine.UpcomingAlarm;
 
 import java.util.List;
 
@@ -10,6 +11,7 @@ import java.util.List;
 public class MainResponse {
     private List<WeekRateInfo> weekRateInfoList;
     private List<MedicineAlarmRecord> medicineAlarmRecords;
+    private UpcomingAlarm upcomingAlarm;
     private String grade;
     private Integer takenDay;
     private Integer month;
