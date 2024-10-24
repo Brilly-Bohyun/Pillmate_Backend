@@ -11,6 +11,7 @@ import java.util.List;
 public class MainResponse {
     private UpcomingAlarm upcomingAlarm;
     private List<MedicineAlarmRecord> medicineAlarmRecords;
+    private List<RemainingMedicine> remainingMedicine;
     private BestRecord bestRecord;
     private WorstRecord worstRecord;
 }

@@ -8,6 +8,7 @@ import pillmate.backend.dto.main.AdherenceRate;
 import pillmate.backend.dto.main.BestRecord;
 import pillmate.backend.dto.main.MainResponse;
 import pillmate.backend.dto.main.MedicineAlarmRecord;
+import pillmate.backend.dto.main.RemainingMedicine;
 import pillmate.backend.dto.main.WorstRecord;
 import pillmate.backend.entity.Alarm;
 import pillmate.backend.entity.MedicinePerMember;
@@ -15,7 +16,9 @@ import pillmate.backend.repository.AlarmRepository;
 import pillmate.backend.repository.MedicinePerMemberRepository;
 import pillmate.backend.repository.MedicineRecordRepository;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -35,6 +38,7 @@ public class MainService {
         return MainResponse.builder()
                 .upcomingAlarm(alarmService.getUpcomingAlarm(memberId, currentTime))
                 .medicineAlarmRecords(getMedicineRecords(memberId))
+                .remainingMedicine(getRemainingMedicine(memberId))
                 .bestRecord(getBestRecord(memberId))
                 .worstRecord(getWorstRecord(memberId))
                 .build();
@@ -69,7 +73,7 @@ public class MainService {
         return medicineRecordRepository.countByMemberIdAndMedicineIdAndIsEatenTrue(memberId, medicineId);
     }
 
-    public List<AdherenceRate> getAllMedicineAdherenceRates(Long memberId) {
+    private List<AdherenceRate> getAllMedicineAdherenceRates(Long memberId) {
         List<MedicinePerMember> medicinePerMembers = medicinePerMemberRepository.findAllByMemberId(memberId);
 
         if (!medicinePerMembers.isEmpty()) {
@@ -91,12 +95,30 @@ public class MainService {
         }
     }
 
-    public BestRecord getBestRecord(Long memberId) {
+    private List<RemainingMedicine> getRemainingMedicine(Long memberId) {
+        List<MedicinePerMember> medicines = findMedicineByMemberId(memberId);
+        return medicines.stream().map(medicinePerMember -> {
+            LocalDate endDate = medicinePerMember.getCreated().plusDays(medicinePerMember.getDay());
+            LocalDate today = LocalDate.now();
+            Long daysLeft = ChronoUnit.DAYS.between(today, endDate);
+
+            return RemainingMedicine.builder()
+                    .name(medicinePerMember.getMedicine().getName())
+                    .day(daysLeft)
+                    .build();
+        }).toList();
+    }
+
+    private BestRecord getBestRecord(Long memberId) {
         return BestRecord.from(getAllMedicineAdherenceRates(memberId).stream().findFirst().orElse(AdherenceRate.empty()));
     }
 
-    public WorstRecord getWorstRecord(Long memberId) {
+    private WorstRecord getWorstRecord(Long memberId) {
         List<AdherenceRate> rates = getAllMedicineAdherenceRates(memberId);
         return WorstRecord.from(rates.isEmpty() ? AdherenceRate.empty() : rates.get(rates.size() - 1));
+    }
+
+    private List<MedicinePerMember> findMedicineByMemberId(Long memberId) {
+        return medicinePerMemberRepository.findAllByMemberId(memberId);
     }
 }
