@@ -9,9 +9,8 @@ import java.util.List;
 @Builder
 @Data
 public class MainResponse {
-    private List<WeekRateInfo> weekRateInfoList;
-    private List<MedicineAlarmRecord> medicineAlarmRecords;
     private UpcomingAlarm upcomingAlarm;
+    private List<MedicineAlarmRecord> medicineAlarmRecords;
     private BestRecord bestRecord;
     private WorstRecord worstRecord;
 }

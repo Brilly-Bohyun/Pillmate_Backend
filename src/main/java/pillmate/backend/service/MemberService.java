@@ -217,7 +217,7 @@ public class MemberService {
                 .rate(getRate(memberId))
                 .build();
     }
-    
+
     private Integer getTakenDay(Long memberId) {
         return medicineRecordRepository.countEatenDates(memberId, START_DATE, END_DATE).size();
     }
