@@ -17,21 +17,24 @@ import pillmate.backend.dto.member.LoginResponse;
 import pillmate.backend.dto.member.LogoutResponse;
 import pillmate.backend.dto.member.ModifyPasswordRequest;
 import pillmate.backend.dto.member.MyHealthInfo;
+import pillmate.backend.dto.member.MyMonthlyInfo;
 import pillmate.backend.dto.member.SignUpRequest;
 import pillmate.backend.entity.member.Member;
 import pillmate.backend.entity.member.MemberType;
 import pillmate.backend.entity.token.LogoutAccessToken;
 import pillmate.backend.entity.token.RefreshToken;
+import pillmate.backend.repository.MedicineRecordRepository;
 import pillmate.backend.repository.MemberRepository;
 import pillmate.backend.service.token.LogoutAccessTokenService;
 import pillmate.backend.service.token.RefreshTokenService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.UUID;
 
 import static pillmate.backend.common.exception.errorcode.ErrorCode.ALREADY_EXIST_USER;
 import static pillmate.backend.common.exception.errorcode.ErrorCode.EXPIRED_TOKEN_VALID_TIME;
-import static pillmate.backend.common.exception.errorcode.ErrorCode.INVALID_EMAIL;
 import static pillmate.backend.common.exception.errorcode.ErrorCode.MISMATCH_EMAIL;
 import static pillmate.backend.common.exception.errorcode.ErrorCode.MISMATCH_PASSWORD;
 import static pillmate.backend.common.exception.errorcode.ErrorCode.MISMATCH_TOKEN;
@@ -44,10 +47,14 @@ import static pillmate.backend.common.exception.errorcode.ErrorCode.NOT_FOUND_US
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
+    private final MedicineRecordRepository medicineRecordRepository;
     private final RefreshTokenService refreshTokenService;
     private final LogoutAccessTokenService logoutAccessTokenService;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
+
+    private LocalDate START_DATE = LocalDate.now().withDayOfMonth(1);
+    private LocalDate END_DATE = LocalDate.now().minusDays(1);
 
     /**
      * 사용자가 입력한 정보를 가지고 MemberRepository에 저장하는 메소드
@@ -202,6 +209,28 @@ public class MemberService {
         return ResponseEntity.ok("수정이 완료되었습니다.");
     }
 
+    public MyMonthlyInfo getMonthlyInfo(Long memberId) {
+        return MyMonthlyInfo.builder()
+                .grade(validateGrade(getRate(memberId)))
+                .takenDay(getTakenDay(memberId))
+                .month(getMonth())
+                .rate(getRate(memberId))
+                .build();
+    }
+    
+    private Integer getTakenDay(Long memberId) {
+        return medicineRecordRepository.countEatenDates(memberId, START_DATE, END_DATE).size();
+    }
+
+    private Integer getMonth() {
+        return YearMonth.now().lengthOfMonth();
+    }
+
+    private Integer getRate(Long memberId) {
+        Integer uneatenDays = medicineRecordRepository.countUneatenDays(memberId, START_DATE, END_DATE);
+        return 100 - (100 / getMonth() * uneatenDays);
+    }
+
     private Member findMemberById(Long memberId) {
         return memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(NOT_FOUND_USER));
     }
@@ -225,5 +254,19 @@ public class MemberService {
     private String getEncodedPassword(SignUpRequest signUpRequest) {
         String password = signUpRequest.getPassword() == null ? UUID.randomUUID().toString() : signUpRequest.getPassword();
         return passwordEncoder.encode(password);
+    }
+
+    private String validateGrade(Integer rate) {
+        if (rate >= 95) {
+            return "매우 우수";
+        } else if (rate >= 90) {
+            return "우수";
+        } else if (rate >= 70) {
+            return "보통";
+        } else if (rate >= 50) {
+            return "나쁨";
+        } else {
+            return "매우 나쁨";
+        }
     }
 }

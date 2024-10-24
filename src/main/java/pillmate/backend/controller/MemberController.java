@@ -25,6 +25,7 @@ import pillmate.backend.dto.member.LoginResponse;
 import pillmate.backend.dto.member.LogoutResponse;
 import pillmate.backend.dto.member.ModifyPasswordRequest;
 import pillmate.backend.dto.member.MyHealthInfo;
+import pillmate.backend.dto.member.MyMonthlyInfo;
 import pillmate.backend.dto.member.SignUpRequest;
 import pillmate.backend.service.AlarmService;
 import pillmate.backend.service.MemberService;
@@ -92,5 +93,10 @@ public class MemberController {
     @PatchMapping("/healthinfo")
     public ResponseEntity<String> updateHealthInfo(@LoggedInMember Long memberId, @RequestBody MyHealthInfo modifyHealthInfo) {
         return memberService.modifyHealthInfo(memberId, modifyHealthInfo);
+    }
+
+    @GetMapping
+    public MyMonthlyInfo getMonthlyInfo(@LoggedInMember Long memberId) {
+        return memberService.getMonthlyInfo(memberId);
     }
 }

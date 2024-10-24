@@ -20,7 +20,6 @@ import pillmate.backend.repository.MedicineRecordRepository;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.YearMonth;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Collections;
 import java.util.Comparator;
@@ -37,18 +36,11 @@ public class MainService {
     private final MedicinePerMemberRepository medicinePerMemberRepository;
     private final MedicineRecordRepository medicineRecordRepository;
 
-    private LocalDate START_DATE = LocalDate.now().withDayOfMonth(1);
-    private LocalDate END_DATE = LocalDate.now().minusDays(1);
-
     public MainResponse show(final Long memberId, LocalTime currentTime) {
         return MainResponse.builder()
                 .weekRateInfoList(getWeeklyIntakeRates(memberId))
                 .medicineAlarmRecords(getMedicineRecords(memberId))
                 .upcomingAlarm(alarmService.getUpcomingAlarm(memberId, currentTime))
-                .grade(validateGrade(getRate(memberId)))
-                .takenDay(getTakenDay(memberId))
-                .month(getMonth())
-                .rate(getRate(memberId))
                 .bestRecord(getBestRecord(memberId))
                 .worstRecord(getWorstRecord(memberId))
                 .build();
@@ -84,21 +76,9 @@ public class MainService {
                 .collect(Collectors.toList());
     }
 
-    private Integer getTakenDay(Long memberId) {
-        return medicineRecordRepository.countEatenDates(memberId, START_DATE, END_DATE).size();
-    }
 
     private Integer getTotalMedicine(Long memberId) {
         return medicinePerMemberRepository.countAllByMemberId(memberId);
-    }
-
-    private Integer getMonth() {
-        return YearMonth.now().lengthOfMonth();
-    }
-
-    private Integer getRate(Long memberId) {
-        Integer uneatenDays = medicineRecordRepository.countUneatenDays(memberId, START_DATE, END_DATE);
-        return 100 - (100 / getMonth() * uneatenDays);
     }
 
     private List<MedicineAlarmRecord> getMedicineRecords(Long memberId) {
@@ -159,33 +139,5 @@ public class MainService {
     public WorstRecord getWorstRecord(Long memberId) {
         List<AdherenceRate> rates = getAllMedicineAdherenceRates(memberId);
         return WorstRecord.from(rates.isEmpty() ? AdherenceRate.empty() : rates.get(rates.size() - 1));
-    }
-
-    private String validateGrade(Integer rate) {
-        if (rate >= 95) {
-            return "매우 우수";
-        } else if (rate >= 90) {
-            return "우수";
-        } else if (rate >= 70) {
-            return "보통";
-        } else if (rate >= 50) {
-            return "나쁨";
-        } else {
-            return "매우 나쁨";
-        }
-    }
-
-    private String validateCategory(String category) {
-        if (category.equals("혈압강하제")) {
-            return "고혈압";
-        } else if (category.equals("동맥경화용제")) {
-            return "고지혈증";
-        } else if (category.equals("당뇨병용제")) {
-            return "당뇨";
-        } else if (category.equals("기타의 호흡기관용약")) {
-            return "호흡기질환";
-        } else {
-            return "기타";
-        }
     }
 }
