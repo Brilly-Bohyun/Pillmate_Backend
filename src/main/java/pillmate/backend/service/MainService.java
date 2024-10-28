@@ -8,6 +8,7 @@ import pillmate.backend.dto.main.AdherenceRate;
 import pillmate.backend.dto.main.BestRecord;
 import pillmate.backend.dto.main.MainResponse;
 import pillmate.backend.dto.main.MedicineAlarmRecord;
+import pillmate.backend.dto.main.MissedAlarm;
 import pillmate.backend.dto.main.RemainingMedicine;
 import pillmate.backend.dto.main.WorstRecord;
 import pillmate.backend.entity.Alarm;
@@ -37,11 +38,22 @@ public class MainService {
     public MainResponse show(final Long memberId, LocalTime currentTime) {
         return MainResponse.builder()
                 .upcomingAlarm(alarmService.getUpcomingAlarm(memberId, currentTime))
+                .missedAlarms(getMissedAlarms(memberId))
                 .medicineAlarmRecords(getMedicineRecords(memberId))
                 .remainingMedicine(getRemainingMedicine(memberId))
                 .bestRecord(getBestRecord(memberId))
                 .worstRecord(getWorstRecord(memberId))
                 .build();
+    }
+
+    private List<MissedAlarm> getMissedAlarms(Long memberId) {
+        LocalTime now = LocalTime.now();
+        return alarmRepository.findMissedAlarms(memberId, now).stream().map(
+                alarm -> MissedAlarm.builder()
+                        .name(alarm.getMedicinePerMember().getMedicine().getName())
+                        .time(alarm.getTimeSlot().getPickerTime())
+                        .build()
+        ).toList();
     }
 
     private List<MedicineAlarmRecord> getMedicineRecords(Long memberId) {

@@ -10,6 +10,7 @@ import java.util.List;
 @Data
 public class MainResponse {
     private UpcomingAlarm upcomingAlarm;
+    private List<MissedAlarm> missedAlarms;
     private List<MedicineAlarmRecord> medicineAlarmRecords;
     private List<RemainingMedicine> remainingMedicine;
     private BestRecord bestRecord;
