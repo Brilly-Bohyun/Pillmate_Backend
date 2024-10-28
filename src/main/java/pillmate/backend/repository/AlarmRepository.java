@@ -27,11 +27,15 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
                                                  @Param("medicineName") String medicineName);
 
     @Query("SELECT a FROM Alarm a " +
-            "JOIN a.medicinePerMember mp " +
-            "JOIN mp.timeSlots ts " +
-            "WHERE mp.medicine.id = :medicineId " +
-            "AND ts.pickerTime = :time")
-    Optional<Alarm> findByMedicineIdAndTime(@Param("medicineId") Long medicineId, @Param("time") LocalTime time);
+            "WHERE a.medicinePerMember.member.id = :memberId " +
+            "AND a.medicinePerMember.medicine.id = :medicineId " +
+            "AND a.timeSlot.pickerTime = :time")
+    Optional<Alarm> findByMemberIdAndMedicineIdAndTime(@Param("memberId") Long memberId,
+                                                       @Param("medicineId") Long medicineId,
+                                                       @Param("time") LocalTime time);
+
+    @Query("SELECT a FROM Alarm a WHERE a.medicinePerMember.member.id = :memberId AND a.timeSlot.pickerTime < :currentTime AND a.isAvailable = true AND a.isEaten = false")
+    List<Alarm> findMissedAlarms(@Param("memberId") Long memberId, @Param("currentTime") LocalTime currentTime);
 
     @Modifying
     @Query("UPDATE Alarm a SET a.isEaten = false")

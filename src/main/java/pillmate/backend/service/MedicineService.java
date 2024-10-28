@@ -45,7 +45,7 @@ public class MedicineService {
 
     @Transactional
     public UpcomingAlarm getUpcomingAlarm(Long memberId, LocalTime currentTime, Long medicineId) {
-        Alarm currentAlarm = findByMedicineAndTime(medicineId, currentTime);
+        Alarm currentAlarm = findByMedicineAndTime(memberId, medicineId, currentTime);
         currentAlarm.updateIsEaten(true);
         medicineRecordRepository.save(MedicineRecord.builder().member(findByMemberId(memberId))
                 .medicine(currentAlarm.getMedicinePerMember().getMedicine())
@@ -167,7 +167,7 @@ public class MedicineService {
         return medicineRepository.findByName(name).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_MEDICINE));
     }
 
-    private Alarm findByMedicineAndTime(Long medicineId, LocalTime time) {
-        return alarmRepository.findByMedicineIdAndTime(medicineId, time).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_ALARM));
+    private Alarm findByMedicineAndTime(Long memberId, Long medicineId, LocalTime time) {
+        return alarmRepository.findByMemberIdAndMedicineIdAndTime(memberId, medicineId, time).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_ALARM));
     }
 }
